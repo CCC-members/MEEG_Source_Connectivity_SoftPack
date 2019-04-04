@@ -118,7 +118,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             Main_simplified_em_penalty_test(app.output_sourse);
             Main_realistic_em_penalty_test(app.output_sourse);
             Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
-            Main_SSVep_AnalyzeData(app.output_sourse);
+            Main_SSVEP_AnalyzeData(app.output_sourse);
         end
     end
 
