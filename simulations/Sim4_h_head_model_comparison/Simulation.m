@@ -74,6 +74,7 @@ for sim = 1:Nsim
     Svv_sim{:,sim}          = Svv;
     Theta_sim{:,sim}        = X;
 end
-save(strcat('simulations',filesep,'Sim4_h_head_model_comparison',filesep,'Pseudorand_Net'),'J_sim', 'Seeders_sim', 'index_full', 'Svv0_sim', 'Svv_sim' ,'Theta_sim', 'vertices', 'faces', 'elec_pos', 'LeadFields', 'Nsubj', 'Nsamp', 'sens_system', 'options')
 delete(process_waitbar1);
+save(strcat('simulations',filesep,'Sim4_h_head_model_comparison',filesep,'Pseudorand_Net'),'J_sim', 'Seeders_sim', 'index_full', 'Svv0_sim', 'Svv_sim' ,'Theta_sim', 'vertices', 'faces', 'elec_pos', 'LeadFields', 'Nsubj', 'Nsamp', 'sens_system', 'options')
+
 end

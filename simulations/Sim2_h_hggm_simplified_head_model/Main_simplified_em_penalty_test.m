@@ -75,11 +75,12 @@ cortex.vertices = vertices;
 cortex.faces    = faces;
 coor            = zeros(p,2);
 for contv = 1:p
-    waitbar((contv)/(p),process_waitbar,strcat('HeadModel-pseudo ','cortex ','coor'));
+    waitbar((contv)/(p),process_waitbar,strcat('HeadModel-pseudo ',' cortex ',' coor'));
     coor(contv,:)    = [radv*cos((contv-1)*angv) radv*sin((contv-1)*angv)];
 end
-save(strcat('simulations',filesep,'Sim2_h_hggm_simplified_head_model',filesep,'HeadModel_pseudo'),'cortex','coor')
 delete(process_waitbar);
+save(strcat('simulations',filesep,'Sim2_h_hggm_simplified_head_model',filesep,'HeadModel_pseudo'),'cortex','coor')
+
 %%
 
 process_waitbar = waitbar(0,'Please wait...');

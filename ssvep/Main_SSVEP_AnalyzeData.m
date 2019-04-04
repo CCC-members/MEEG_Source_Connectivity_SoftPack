@@ -33,13 +33,15 @@ name_list       = {'CAGDAS_KARSAN'}; % Subjects
 freq_list       = {4};               % Experimental conditions 'frequency'
 %%
 %% Load head model
-
+waitbar((1)/(3),process_waitbar,strcat('Please wait...'));
 addpath(strcat('ssvep',filesep,'Data',filesep,'CK',filesep,'EEG'));
 load('ck_leadfield.mat');
 L(end,:)        = [];
 load('ck_model.mat');
 coor(end,:)     = [];
 %%
+waitbar((2)/(3),process_waitbar,strcat('Please wait...'));
+
 %% Split cortical surface into Left and Right Hemispheres for plotting maps
 labels_conn  = {'OL-L' 'TL-L' 'FL-L' 'OL-R' 'TL-R' 'FL-R'};
 TL_slope     = -0.6992;
@@ -55,10 +57,14 @@ FL_R = find((verticesR(:,2) > 38).*(verticesR(:,3) < 10.07));
 %% Load Subject Data
 name            = name_list{1};
 load([name,'.mat'])
+
+waitbar(1,process_waitbar,strcat('Please wait...'));
+delete(process_waitbar);
 %%
 %% Cycle by conditions
 for cond = 1:length(freq_list)
-    waitbar((cond)/(length(freq_list)),process_waitbar,strcat('Collecting Task data'));
+    process_waitbar = waitbar(0,'Please wait...');
+    
     freq                              = freq_list{cond};
     var                               = [name,'_',num2str(freq),'Hz_ICAcorrected','.data'];
     %%
@@ -69,6 +75,7 @@ for cond = 1:length(freq_list)
     for count_blocks = 1:ntask_blocks
         data_EEG_task                 = [data_EEG_task, data_EEG(:,eeg_task_points{count_blocks})];
     end
+    waitbar(1/2,process_waitbar,strcat('Collecting Task data'));
     %%
     %% Cross-spectra
     fmax                              = 2*freq_list{cond} +5;
@@ -79,9 +86,12 @@ for cond = 1:length(freq_list)
     for cont_freq = 1:Nf
         [Svv_full(:,:,cont_freq),K]   = applying_reference(Svv_full(:,:,cont_freq),full(L));    % applying average reference...
     end
+    waitbar(2/2,process_waitbar,strcat('Collecting Task data'));
+    delete(process_waitbar);
     figure_occ_harmonics(F,PSD,freq,output_sourse);
     %%
     %% split Lead Field
+    process_waitbar = waitbar(0,'Please wait...');
     K_L  = K(:,indvL);
     K_R  = K(:,indvR);
     %%
@@ -92,6 +102,8 @@ for cond = 1:length(freq_list)
     for ratio = ratio_list
         [tmp,freqid]                  = min(abs(F - ratio*freq));
         for neigh = neigh_list
+            waitbar((ratio*neigh)/(length(ratio_list)*length(neigh_list)),process_waitbar,...
+                strcat('Pick frequency bins for analysis'));
             Svv_tmp                   = Svv_full(:,:,(freqid + neigh));
             Svv_tmp                   = Svv_tmp/(sum(abs(diag(Svv_tmp)))/size(Svv_tmp,1));
             Svv                       = Svv + Svv_tmp;
@@ -99,14 +111,19 @@ for cond = 1:length(freq_list)
     end
     Svv = Svv/(length(neigh_list)*length(ratio_list));
     Ns  = Ns*length(neigh_list)*length(ratio_list);
+    delete(process_waitbar);
     %%
     %% Activation Leakage Module
     disp('activation leakage module...');
+    process_waitbar = waitbar(0,'Activation leakage module......');
     % Default Atlas (groups)
     nonovgroups = [];
     for ii = 1:length(K)
+        waitbar((ii)/(length(K)),process_waitbar,strcat('Activation leakage module'));
         nonovgroups{ii} = ii;
     end
+    delete(process_waitbar);
+    
     [miu,sigma_post,DSTF]             = cross_nonovgrouped_enet_ssbl({Svv},{K},Ns,nonovgroups);
     stat                              = sqrt(abs(miu))./abs(sigma_post);
     indms                             = find(stat > 0.5);
@@ -148,6 +165,7 @@ for cond = 1:length(freq_list)
     %%
     %% Connectivity Leakage Module
     disp('connectivity leakage module...');
+     process_waitbar = waitbar(0,'Connectivity leakage module...');
     % parameters
     param.maxiter_outer               = 60;
     param.maxiter_inner               = 30;
@@ -162,10 +180,11 @@ for cond = 1:length(freq_list)
     Thetajj                           = zeros(q,q,length(penalty));
     Sjj                               = zeros(q,q,length(penalty));
     for k_penalty = 1:length(penalty)
+         waitbar((k_penalty)/(length(penalty)),process_waitbar,strcat('Connectivity leakage module...'));
         param.penalty  = penalty(k_penalty);
         [Thetajj(:,:,k_penalty),Sjj(:,:,k_penalty),llh{k_penalty},jj_on,xixi_on] = h_hggm(Svv,Kindms,param);
     end
-    
+    delete(process_waitbar);
     
     %%
     figure_partial_correlation_maps1 = figure;
@@ -244,5 +263,5 @@ for cond = 1:length(freq_list)
     delete(figure_iterations_likelihood);
     
 end
-delete(process_waitbar);
+
 end
