@@ -1,5 +1,3 @@
-
-
 %%
 % Authors:
 % - Deirel Paz Linares
@@ -12,9 +10,6 @@
 
 % Updates
 % - Ariosky Areces Gonzalez
-
-%%
-
 
 
 classdef h_hggm_simpack < matlab.apps.AppBase
@@ -32,7 +27,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
         HHGGMRealisticHeadModelMenu   matlab.ui.container.Menu
         HHGGMHeadModelComparisonMenu  matlab.ui.container.Menu
         SSVEPMenu                     matlab.ui.container.Menu
-        AllAnalyceMenu                matlab.ui.container.Menu
+        AllAnalyzeMenu                matlab.ui.container.Menu
         HelpMenu                      matlab.ui.container.Menu
     end
 
@@ -71,6 +66,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                 end
             end
             Main_Jankova_test(app.output_sourse);
+            msgbox('Completed operation','Info');
         end
 
         % Menu selected function: SSVEPMenu
@@ -82,6 +78,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                 end
             end
             Main_SSVEP_AnalyzeData(app.output_sourse);
+            msgbox('Completed operation','Info');
         end
 
         % Menu selected function: HHGGMSimplifiedHeadModelMenu
@@ -93,6 +90,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                 end
             end
             Main_simplified_em_penalty_test(app.output_sourse);
+            msgbox('Completed operation','Info');
         end
 
         % Menu selected function: HHGGMRealisticHeadModelMenu
@@ -104,6 +102,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                 end
             end
             Main_realistic_em_penalty_test(app.output_sourse);
+            msgbox('Completed operation','Info');
         end
 
         % Menu selected function: HHGGMHeadModelComparisonMenu
@@ -115,6 +114,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                 end
             end
             Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
+            msgbox('Completed operation','Info');
         end
 
         % Menu selected function: OutputsourseMenu
@@ -126,8 +126,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             % create_data_structure(folder);
         end
 
-        % Menu selected function: AllAnalyceMenu
-        function AllAnalyceMenuSelected(app, event)
+        % Menu selected function: AllAnalyzeMenu
+        function AllAnalyzeMenuSelected(app, event)
            if(isempty( app.output_sourse) |  app.output_sourse==0)
                 app.output_sourse = uigetdir('tittle','Select the Output Folder');
                 if(app.output_sourse==0)
@@ -139,6 +139,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             Main_realistic_em_penalty_test(app.output_sourse);
             Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
             Main_SSVEP_AnalyzeData(app.output_sourse);
+            msgbox('Completed operation','Info');
         end
     end
 
@@ -200,10 +201,10 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             app.SSVEPMenu.MenuSelectedFcn = createCallbackFcn(app, @SSVEPMenuSelected, true);
             app.SSVEPMenu.Text = 'SSVEP';
 
-            % Create AllAnalyceMenu
-            app.AllAnalyceMenu = uimenu(app.ToolsMenu);
-            app.AllAnalyceMenu.MenuSelectedFcn = createCallbackFcn(app, @AllAnalyceMenuSelected, true);
-            app.AllAnalyceMenu.Text = 'All Analyce';
+            % Create AllAnalyzeMenu
+            app.AllAnalyzeMenu = uimenu(app.ToolsMenu);
+            app.AllAnalyzeMenu.MenuSelectedFcn = createCallbackFcn(app, @AllAnalyzeMenuSelected, true);
+            app.AllAnalyzeMenu.Text = 'All Analyze';
 
             % Create HelpMenu
             app.HelpMenu = uimenu(app.HHGGMSimulationPackUIFigure);
