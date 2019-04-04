@@ -53,6 +53,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             addpath('simulations/Sim2_h_hggm_simplified_head_model');
             addpath('simulations/Sim3_h_hggm_realistic_head_model');
             addpath('simulations/Sim4_h_head_model_comparison');
+            addpath('simulations/Sim_data');
             addpath('ssvep');
         end
 
