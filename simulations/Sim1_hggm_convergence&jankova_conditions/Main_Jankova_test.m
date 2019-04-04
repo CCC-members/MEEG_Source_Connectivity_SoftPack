@@ -1,8 +1,20 @@
 function result = Main_Jankova_test(output_sourse)
 %%
-% Pedro Valdes-Sosa, Oct 2017
-% Deirel Paz Linares, Oct 2017
-% Eduardo Gonzalez-Moreira, Oct 2017
+
+%%
+% Authors:
+% - Deirel Paz Linares
+% - Eduardo Gonzalez Moreira
+% - Pedro A. Valdes Sosa
+
+% Date: April 4, 2019
+
+
+% Updates
+% - Ariosky Areces Gonzalez
+
+% Date: April 4, 2019
+
 %%
 % Simulates a q-size Partial Correlation (PC) matrix made up a predefined
 % number of blocks (nblocks) and uses m-samples of an Cyrcularly Symmetric

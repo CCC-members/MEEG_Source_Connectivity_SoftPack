@@ -1,5 +1,18 @@
 function result = Main_simplified_em_penalty_test(output_sourse)
 
+%%
+% Authors:
+% - Deirel Paz Linares
+% - Eduardo Gonzalez Moreira
+% - Pedro A. Valdes Sosa
+
+% Date: April 4, 2019
+
+
+% Updates
+% - Ariosky Areces Gonzalez
+
+% Date: April 4, 2019
 
 %% Test Penalties
 

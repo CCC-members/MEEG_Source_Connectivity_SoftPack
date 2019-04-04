@@ -1,5 +1,21 @@
 function result = Main_SSVEP_AnalyzeData(output_sourse)
 
+%%
+% Authors:
+% - Deirel Paz Linares
+% - Eduardo Gonzalez Moreira
+% - Pedro A. Valdes Sosa
+
+% Date: April 4, 2019
+
+
+% Updates
+% - Ariosky Areces Gonzalez
+
+% Date: April 4, 2019
+
+
+
 %% General Parameters
 
 output_sourse = strcat(output_sourse, filesep,'SSVEP_AnalyzeData');

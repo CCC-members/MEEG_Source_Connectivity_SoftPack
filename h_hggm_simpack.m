@@ -1,3 +1,22 @@
+
+
+%%
+% Authors:
+% - Deirel Paz Linares
+% - Eduardo Gonzalez Moreira
+% - Pedro A. Valdes Sosa
+
+% Date: March 16, 2019
+
+
+
+% Updates
+% - Ariosky Areces Gonzalez
+
+%%
+
+
+
 classdef h_hggm_simpack < matlab.apps.AppBase
 
     % Properties that correspond to app components

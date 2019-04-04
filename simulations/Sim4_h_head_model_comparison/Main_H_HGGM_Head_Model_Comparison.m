@@ -1,6 +1,20 @@
 function result = Main_H_HGGM_Head_Model_Comparison(output_sourse)
 
 
+%%
+% Authors:
+% - Deirel Paz Linares
+% - Eduardo Gonzalez Moreira
+% - Pedro A. Valdes Sosa
+
+% Date: April 4, 2019
+
+
+% Updates
+% - Ariosky Areces Gonzalez
+
+% Date: April 4, 2019
+
 
 output_sourse = strcat(output_sourse, filesep,'H_HGGM_Head_Model_Comparison');
 mkdir(output_sourse);
