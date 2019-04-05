@@ -56,7 +56,8 @@ FL_R = find((verticesR(:,2) > 38).*(verticesR(:,3) < 10.07));
 %%
 %% Load Subject Data
 name            = name_list{1};
-load([name,'.mat'])
+name_file       = strcat(name,'.mat');
+load(name_file);
 
 waitbar(1,process_waitbar,strcat('Please wait...'));
 delete(process_waitbar);
