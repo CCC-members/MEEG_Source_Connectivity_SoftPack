@@ -107,7 +107,7 @@ param.m             = m;
 param.rth           = 3.16;
 param.axi           = 1E-5;
 param.Axixi         = eye(length(Svv));
-%%
+%% h-hggm
 penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
 Thetajj_est         = zeros(q,q,length(penalty));
 llh_outer           = cell(1,length(penalty));
@@ -117,14 +117,21 @@ for cont = 1:length(penalty)
     param.penalty  = penalty(cont);
     [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont},xixi_on,jj_on] = h_hggm(Svv,Lvj,param);
 end
+%% eloreta + hggm
+param.gamma1        = 0.001;
+param.gamma2        = 0.05;
+param.delta_gamma   = 0.001;
+[Thetajj_est(:,:,4),Sjj_est,gamma_grid,gamma,gcv] = eloreta_hggm(Svv,Lvj,param);
+%%
 delete(process_waitbar);
 %% Plot Results
-figure_partial_correlation_maps = figure;
+figure_partial_correlation_maps = figure('Position',[182,114,832,521]);
+
 %%
 X = Thetajj_sim;
 X = X - diag(diag(X));
 X = X/max(abs(X(:)));
-subplot(2,2,1); imagesc(abs(X));
+subplot(2,3,1); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
 title('simulated partial correlations')
@@ -132,7 +139,7 @@ title('simulated partial correlations')
 X = Thetajj_est(:,:,1);
 X = X - diag(diag(X));
 X = X/max(abs(X(:)));
-subplot(2,2,2); imagesc(abs(X));
+subplot(2,3,2); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
 title('h-hggm-lasso partial correlations')
@@ -140,7 +147,7 @@ title('h-hggm-lasso partial correlations')
 X = Thetajj_est(:,:,2);
 X = X - diag(diag(X));
 X = X/max(abs(X(:)));
-subplot(2,2,3); imagesc(abs(X));
+subplot(2,3,3); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
 title('h-hggm-ridge partial correlations')
@@ -148,12 +155,21 @@ title('h-hggm-ridge partial correlations')
 X = Thetajj_est(:,:,3);
 X = X - diag(diag(X));
 X = X/max(abs(X(:)));
-subplot(2,2,4); imagesc(abs(X));
+subplot(2,3,4); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
-title('h-hggm-naive partial correlations')
+title('vareta-hggm partial correlations')
 colormap('hot');
-
+%%
+X = Thetajj_est(:,:,4);
+X = X - diag(diag(X));
+X = X/max(abs(X(:)));
+subplot(2,3,5); imagesc(abs(X));
+ylabel('generators')
+xlabel('generators')
+title('eloreta-hggm partial correlations')
+colormap('hot');
+%%
 saveas( figure_partial_correlation_maps,strcat(output_sourse,filesep,'partial_correlation_maps.fig'));
 disp(strcat('Saving figure ---->  Partial Correlation Maps to  ---> ', output_sourse) );
 delete(figure_partial_correlation_maps);

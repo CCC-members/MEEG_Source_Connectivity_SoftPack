@@ -5,7 +5,7 @@ function [] = Results(output_sourse)
 load('colormap2.mat')
 load('Pseudorand_Net.mat')
 measures_label    = {'auc' 'sens' 'spec' 'prec' 'f1'};
-methods_label     = {'h-hggm-lasso';'h-hggm-ridge';'h-hggm-naive'};
+methods_label     = {'h-hggm-lasso';'h-hggm-ridge';'h-hggm-naive';'eloreta-hggm'};
 Nmeasures         = length(measures_label);
 %%
 %% h_hggm
@@ -17,19 +17,19 @@ measures_std      = round(100*std(measures,0,3));
 %%
 %%
 process_waitbar = waitbar(0,'Please wait...');
-for meth = 1:3
+for meth = 1:4
     for meas = 1:5
-        waitbar((meth*meas)/(15),process_waitbar,strcat('Outputing results....'));
+        waitbar((meth*meas)/(20),process_waitbar,strcat('Outputing results....'));
         measures_h_hggm{meth,meas}  = [num2str(measures_mean(meth,meas)) '+/-' num2str(measures_std(meth,meas))];
     end
 end
 delete(process_waitbar);
 %%
 %% Table with quality measures
-Table = cell(4,6);
+Table = cell(5,6);
 Table(2:end,1)    = methods_label;
 Table(1,2:end)    = measures_label;
-Table(2:4,2:end)  = measures_h_hggm;
+Table(2:end,2:end)  = measures_h_hggm;
 
 
 save(strcat(output_sourse,filesep,'Table_sens_system_',sens_system,'.mat'));
@@ -44,11 +44,11 @@ Nsim = ceil(size(sol_h_hggm,2));
 figure_likelihood = figure; 
 
 subplot(3,2,1);
-llh = zeros(length(sol_h_hggm{4,1}{1}),Nsim);
+llh = zeros(length(sol_h_hggm{4,1}{1}{1}),Nsim);
 
 for sim = 1:Nsim
   
-    llh(:,sim) = sol_h_hggm{4,sim}{1};
+    llh(:,sim) = sol_h_hggm{4,sim}{1}{1};
 end
 
 plot(llh);
@@ -61,10 +61,10 @@ title('h-hggm-lasso likelihood')
 %%
 
 subplot(3,2,2); 
-llh = zeros(length(sol_h_hggm{4,1}{2}),Nsim);
+llh = zeros(length(sol_h_hggm{4,1}{1}{2}),Nsim);
 for sim = 1:Nsim
    
-    llh(:,sim) = sol_h_hggm{4,sim}{2};  
+    llh(:,sim) = sol_h_hggm{4,sim}{1}{2};  
 end
 
 plot(llh);
@@ -76,16 +76,34 @@ title('h-hggm-ridge likelihood')
 %%
 
 subplot(3,2,3); 
-llh = zeros(length(sol_h_hggm{4,1}{3}),Nsim);
+llh = zeros(length(sol_h_hggm{4,1}{1}{3}),Nsim);
 for sim = 1:Nsim
     
-    llh(:,sim) = sol_h_hggm{4,sim}{3};
+    llh(:,sim) = sol_h_hggm{4,sim}{1}{3};
 end
 
 plot(llh);
 ylabel('likelihood')
 xlabel('iterations')
 title('h-hggm-naive likelihood')
+
+
+%%
+
+
+subplot(3,2,4); 
+for sim = 1:Nsim
+    [gcv_opt,idx_gamma]       = min(sol_h_hggm{4,sim}{3});
+    plot(sol_h_hggm{4,1}{2},sol_h_hggm{4,sim}{3},...
+        '-',sol_h_hggm{4,1}{2}(idx_gamma),...
+        gcv_opt,'b*');
+    hold on;
+end
+
+ylabel('gcv value')
+xlabel('regularization parameter')
+title('eloreta-hggm gcv function')
+
 %% Plot corticaL map 
 cortex.vertices = vertices;
 cortex.faces    = faces;
@@ -94,7 +112,7 @@ J = zeros(qfull,1);
 J(index_full) = 1;
 %%
 if strcmp(sens_system,'large') == 1 || strcmp(sens_system,'small') == 1
-    subplot(3,2,4); 
+    subplot(3,2,5); 
     patch('Faces',facesL,'Vertices',verticesL,'FaceVertexCData',J(indvL),'FaceColor','interp',...
     'EdgeColor',[0.313725501298904 0.313725501298904 0.313725501298904],'FaceAlpha',.95);
     if strcmp(sens_system,'large') == 1

@@ -44,6 +44,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             clc;
             clear all;
             close all;
+            addpath('simulations/Sim_Common_Functions');
             addpath('simulations/Sim1_hggm_convergence&jankova_conditions');
             addpath('simulations/Sim2_h_hggm_simplified_head_model');
             addpath('simulations/Sim3_h_hggm_realistic_head_model');

@@ -31,9 +31,9 @@ for i = 1:2
     else
         sens_system = 'large';
     end
-  
+    
     process_waitbar = waitbar(0,'Please wait...');
-
+    waitbar(i/2,process_waitbar,strcat('h-hggm & eloreta-hggm solution for Sim #',num2str(k_sim),' - SS:',sens_system ));
     %%
     if strcmp(sens_system,'large') == 1
         load('HeadModel_large.mat'); % Load mesh vertices (all Lead Fields should be given on homemorph surfaces)
@@ -54,7 +54,6 @@ for i = 1:2
     Nseed        = size(data_tips,2);
     Seeders      = zeros(Nseed,1);
     for cont = 1:Nseed
-        waitbar((cont)/(Nseed),process_waitbar,strcat('Definition of Cortical points'));
         coord_tmp = data_tips(cont).Position;
         vx       = coord_tmp(1);
         vy       = coord_tmp(2);
@@ -62,10 +61,8 @@ for i = 1:2
         Seeders(cont) = pickpoint(vx,vy,vz,vertices,1E-3);
     end
     Seeders      = Seeders(randperm(Nseed));
-    delete(process_waitbar);
-    %%
     
-    process_waitbar = waitbar(0,'Please wait...');
+    %%
     if strcmp(sens_system,'large') == 1
         load ('LeadFields_large.mat'); % Load Lead Field cell array (1 X number of Lead Fields)
         subject    = [1]; %User defined, pick numbers from 1-number of Lead Fields
@@ -98,15 +95,10 @@ for i = 1:2
     d0  = 5E-3;
     index_full = [];
     for point = 1:Nseed
-        waitbar((point)/(Nseed),process_waitbar,strcat('Biological noise'));
         Source          = Seeders(point);
         [index,findex]  = surfpatch(Source,vertices,faces,d0);
         index_full      = [index_full;index];
     end
-    delete(process_waitbar);
-    
-    
-    process_waitbar = waitbar(0,'Please wait...');
     
     Nnoise              = length(index_full);
     bionoise            = randn(Nnoise,m) + 1i*randn(Nnoise,m);
@@ -128,25 +120,30 @@ for i = 1:2
     param.Axixi         = eye(length(Svv));
     %%
     penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
-    Thetajj_est         = zeros(q,q,length(penalty));
+    Thetajj_est         = zeros(q,q,length(penalty) + 1);
     llh_outer           = cell(1,length(penalty));
     llh_inner           = cell(1,length(penalty));
     for cont = 1:length(penalty)
-        waitbar((cont)/(length(penalty)),process_waitbar,strcat('Likelihood test'));
+        
         param.penalty  = penalty(cont);
         [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont},xixi_on,jj_on] = h_hggm(Svv,Lvj(:,Seeders),param);
     end
     
-    delete(process_waitbar);
-    
+    %% eloreta + hggm
+    param.gamma1        = 0.001;
+    param.gamma2        = 0.05;
+    param.delta_gamma   = 0.001;
+    [Thetajj_est(:,:,4),Sjj_est,gamma_grid,gamma,gcv] = eloreta_hggm(Svv,Lvj(:,Seeders),param);
+    %%
     
     %% Plot Results
-    figure_partial_correlations_maps = figure;
+    figure_partial_correlations_maps = figure('Position',[182,114,832,521]);
+    
     %%
     X = Thetajj_sim;
     X = X - diag(diag(X));
     X = X/max(abs(X(:)));
-    subplot(2,2,1); imagesc(abs(X));
+    subplot(2,3,1); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
     title('simulated partial correlations')
@@ -154,7 +151,7 @@ for i = 1:2
     X = Thetajj_est(:,:,1);
     X = X - diag(diag(X));
     X = X/max(abs(X(:)));
-    subplot(2,2,2); imagesc(abs(X));
+    subplot(2,3,2); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
     title('h-hggm-lasso partial correlations')
@@ -162,7 +159,7 @@ for i = 1:2
     X = Thetajj_est(:,:,2);
     X = X - diag(diag(X));
     X = X/max(abs(X(:)));
-    subplot(2,2,3); imagesc(abs(X));
+    subplot(2,3,3); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
     title('h-hggm-ridge partial correlations')
@@ -170,11 +167,22 @@ for i = 1:2
     X = Thetajj_est(:,:,3);
     X = X - diag(diag(X));
     X = X/max(abs(X(:)));
-    subplot(2,2,4); imagesc(abs(X));
+    subplot(2,3,4); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
     title('h-hggm-naive partial correlations')
     colormap('hot');
+    
+    %%
+    X = Thetajj_est(:,:,4);
+    X = X - diag(diag(X));
+    X = X/max(abs(X(:)));
+    subplot(2,3,5); imagesc(abs(X));
+    ylabel('generators')
+    xlabel('generators')
+    title('eloreta-hggm partial correlations')
+    colormap('hot');
+    %%
     
     saveas( figure_partial_correlations_maps,strcat(output_sourse,filesep,'partial_correlation_maps_(',sens_system,')_.fig'));
     disp(strcat('Saving figure ---->  Partial Correlation Maps to  ---> ', output_sourse) );

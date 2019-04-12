@@ -12,7 +12,9 @@ for sim = 1:Nsim
         Xtmp = Xest(:,:,meth);
 %         Xtmp = abs(Xtmp)./(sqrt(abs(diag(Xtmp))*abs(diag(Xtmp))') + 1E-4*max(abs((diag(Xtmp)))));
         Xtmp = Xtmp - diag(diag(Xtmp));
-        Xtmp = abs(Xtmp)/max(abs(Xtmp(:)));
+        if max(abs(Xtmp(:))) ~= 0 
+            Xtmp = abs(Xtmp)/max(abs(Xtmp(:)));
+        end
         %% ROC analysis
         %X->spec Y->sens
         [spec,sens,th,auc,OPTROCPT] = perfcurve(Xsim(:),Xtmp(:),true);
