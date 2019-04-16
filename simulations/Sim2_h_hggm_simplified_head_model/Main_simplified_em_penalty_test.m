@@ -109,7 +109,7 @@ param.axi           = 1E-5;
 param.Axixi         = eye(length(Svv));
 %% h-hggm
 penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
-Thetajj_est         = zeros(q,q,length(penalty));
+Thetajj_est         = zeros(q,q,length(penalty) + 2);
 llh_outer           = cell(1,length(penalty));
 llh_inner           = cell(1,length(penalty));
 for cont = 1:length(penalty)
@@ -118,10 +118,16 @@ for cont = 1:length(penalty)
     [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont},xixi_on,jj_on] = h_hggm(Svv,Lvj,param);
 end
 %% eloreta + hggm
-param.gamma1        = 0.001;
-param.gamma2        = 0.05;
-param.delta_gamma   = 0.001;
+param.gamma1        = 1e-3;
+param.gamma2        = 5e-2;
+param.delta_gamma   = 1e-3;
 [Thetajj_est(:,:,4),Sjj_est,gamma_grid,gamma,gcv] = eloreta_hggm(Svv,Lvj,param);
+
+%% lcmv + hggm
+param.gamma         = sum(abs(diag(Svv)))/(length(Svv)*100);
+[Thetajj_est(:,:,5),Sjj_est] = lcmv_hggm(Svv,Lvj,param);
+
+
 %%
 delete(process_waitbar);
 %% Plot Results
@@ -168,6 +174,15 @@ subplot(2,3,5); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
 title('eloreta-hggm partial correlations')
+colormap('hot');
+%%
+X = Thetajj_est(:,:,5);
+X = X - diag(diag(X));
+X = X/max(abs(X(:)));
+subplot(2,3,6); imagesc(abs(X));
+ylabel('generators')
+xlabel('generators')
+title('lcmv-hggm partial correlations')
 colormap('hot');
 %%
 saveas( figure_partial_correlation_maps,strcat(output_sourse,filesep,'partial_correlation_maps.fig'));

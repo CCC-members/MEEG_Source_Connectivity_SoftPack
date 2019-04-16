@@ -33,7 +33,7 @@ for i = 1:2
     end
     
     process_waitbar = waitbar(0,'Please wait...');
-    waitbar(i/2,process_waitbar,strcat('h-hggm & eloreta-hggm solution for Sim #',num2str(k_sim),' - SS:',sens_system ));
+    waitbar(i/2,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
     %%
     if strcmp(sens_system,'large') == 1
         load('HeadModel_large.mat'); % Load mesh vertices (all Lead Fields should be given on homemorph surfaces)
@@ -120,7 +120,7 @@ for i = 1:2
     param.Axixi         = eye(length(Svv));
     %%
     penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
-    Thetajj_est         = zeros(q,q,length(penalty) + 1);
+    Thetajj_est         = zeros(q,q,length(penalty) + 2);
     llh_outer           = cell(1,length(penalty));
     llh_inner           = cell(1,length(penalty));
     for cont = 1:length(penalty)
@@ -134,8 +134,12 @@ for i = 1:2
     param.gamma2        = 0.05;
     param.delta_gamma   = 0.001;
     [Thetajj_est(:,:,4),Sjj_est,gamma_grid,gamma,gcv] = eloreta_hggm(Svv,Lvj(:,Seeders),param);
-    %%
     
+    %% lcmv + hggm
+    param.gamma         = sum(abs(diag(Svv)))/(length(Svv)*100);
+    [Thetajj_est(:,:,5),Sjj_est] = lcmv_hggm(Svv,Lvj,param);
+    
+        
     %% Plot Results
     figure_partial_correlations_maps = figure('Position',[182,114,832,521]);
     
@@ -181,6 +185,16 @@ for i = 1:2
     ylabel('generators')
     xlabel('generators')
     title('eloreta-hggm partial correlations')
+    colormap('hot');
+    
+    %%
+    X = Thetajj_est(:,:,5);
+    X = X - diag(diag(X));
+    X = X/max(abs(X(:)));
+    subplot(2,3,6); imagesc(abs(X));
+    ylabel('generators')
+    xlabel('generators')
+    title('lcmv-hggm partial correlations')
     colormap('hot');
     %%
     

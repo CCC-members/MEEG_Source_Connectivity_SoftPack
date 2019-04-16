@@ -104,6 +104,20 @@ ylabel('gcv value')
 xlabel('regularization parameter')
 title('eloreta-hggm gcv function')
 
+
+subplot(3,2,5); 
+for sim = 1:Nsim
+    [gcv_opt,idx_gamma]       = min(sol_h_hggm{4,sim}{3});
+    plot(sol_h_hggm{4,1}{2},sol_h_hggm{4,sim}{3},...
+        '-',sol_h_hggm{4,1}{2}(idx_gamma),...
+        gcv_opt,'b*');
+    hold on;
+end
+
+ylabel('gcv value')
+xlabel('regularization parameter')
+title('lcmv-hggm gcv function')
+
 %% Plot corticaL map 
 cortex.vertices = vertices;
 cortex.faces    = faces;

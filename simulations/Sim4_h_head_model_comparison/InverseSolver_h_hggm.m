@@ -17,8 +17,8 @@ for k_sim = 1:Nsim
     waitbar((k_sim)/(Nsim),process_waitbar,strcat('h-hggm & eloreta-hggm solution for Sim #',num2str(k_sim),' - SS:',sens_system));
     disp(['h-hggm and eloreta-hggm solution for simulation # ',num2str(k_sim),' '])
     %% connectivity leakage module
-    Thetajj_est             = zeros(Nseed,Nseed,length(penalty) + 1);
-    Sjj_est                 = zeros(Nseed,Nseed,length(penalty) + 1);
+    Thetajj_est             = zeros(Nseed,Nseed,length(penalty) + 2);
+    Sjj_est                 = zeros(Nseed,Nseed,length(penalty) + 2);
     %% h-hggm
     for k_penalty = 1:length(penalty)
         param.penalty  = penalty(k_penalty);
@@ -30,6 +30,12 @@ for k_sim = 1:Nsim
     param.delta_gamma   = 0.001;
     [Thetajj_est(:,:,4),Sjj_est(:,:,4),gamma_grid,gamma,gcv] = eloreta_hggm(Svv_sim{k_sim}{1},LeadFields{1}(:,Seeders_sim(:,k_sim)),param);
     %%
+    
+      
+    %% lcmv + hggm
+    param.gamma         = sum(abs(diag(Svv_sim{k_sim}{1})))/(length(Svv_sim{k_sim}{1})*100);
+    [Thetajj_est(:,:,5),Sjj_est(:,:,5)] = lcmv_hggm(Svv_sim{k_sim}{1},LeadFields{1}(:,Seeders_sim(:,k_sim)),param);    
+        
     
     %%
     sol_h_hggm{1,k_sim}       = Seeders_sim;
