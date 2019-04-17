@@ -1,17 +1,3 @@
-%%
-% Authors:
-% - Deirel Paz Linares
-% - Eduardo Gonzalez Moreira
-% - Pedro A. Valdes Sosa
-
-% Date: March 16, 2019
-
-
-
-% Updates
-% - Ariosky Areces Gonzalez
-
-
 classdef h_hggm_simpack < matlab.apps.AppBase
 
     % Properties that correspond to app components
@@ -44,7 +30,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             clc;
             clear all;
             close all;
-            addpath('simulations/Sim_Common_Functions');
+            addpath('common_functions');
             addpath('simulations/Sim1_hggm_convergence&jankova_conditions');
             addpath('simulations/Sim2_h_hggm_simplified_head_model');
             addpath('simulations/Sim3_h_hggm_realistic_head_model');

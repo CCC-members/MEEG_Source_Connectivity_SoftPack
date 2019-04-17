@@ -173,6 +173,7 @@ for cond = 1:length(freq_list)
     param.m                           = Ns;
     param.rth                         = 3.55;
     param.axi                         = 1E-1;
+    param.sigma2xi                    = 1E0;
     param.Axixi                       = eye(size(Svv,1));
     %%
     Kindms                            = cat(2,K_L(:,[indmsL{1};indmsL{2};indmsL{3}]),K_R(:,[indmsR{1};indmsR{2};indmsR{3}]));

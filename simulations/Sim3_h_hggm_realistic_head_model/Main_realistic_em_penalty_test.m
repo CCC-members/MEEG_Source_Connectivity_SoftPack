@@ -117,6 +117,7 @@ for i = 1:2
     param.m             = m;
     param.rth           = 3.16;
     param.axi           = 1E-5;
+    param.sigma2xi      = 1E0;
     param.Axixi         = eye(length(Svv));
     %%
     penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
@@ -137,7 +138,7 @@ for i = 1:2
     
     %% lcmv + hggm
     param.gamma         = sum(abs(diag(Svv)))/(length(Svv)*100);
-    [Thetajj_est(:,:,5),Sjj_est] = lcmv_hggm(Svv,Lvj,param);
+    [Thetajj_est(:,:,5),Sjj_est] = lcmv_hggm(Svv,Lvj(:,Seeders),param);
     
         
     %% Plot Results

@@ -8,6 +8,7 @@ param.maxiter_inner = 30;
 param.m             = Nsamp;
 param.rth           = 3.16;
 param.axi           = 1E-5;
+param.sigma2xi      = 1E0;
 param.Axixi         = eye(length(Svv_sim{1,1}{1,1}));
 llh                 = cell(1,length(penalty));
 %%

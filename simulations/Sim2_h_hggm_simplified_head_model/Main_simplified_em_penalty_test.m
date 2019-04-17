@@ -106,6 +106,7 @@ param.maxiter_inner = 30;
 param.m             = m;
 param.rth           = 3.16;
 param.axi           = 1E-5;
+param.sigma2xi      = 1E0;
 param.Axixi         = eye(length(Svv));
 %% h-hggm
 penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
