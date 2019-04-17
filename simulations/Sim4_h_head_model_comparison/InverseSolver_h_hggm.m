@@ -44,6 +44,6 @@ for k_sim = 1:Nsim
     %%
     sol_h_hggm{3,k_sim}       = Thetajj_est;
     %%
-    sol_h_hggm{4,k_sim}       = {llh,gamma_grid,gcv,gamma};
+    sol_h_hggm{4,k_sim}       = {llh,gamma_grid,gcv,gamma,param.gamma};
 end
 delete(process_waitbar);

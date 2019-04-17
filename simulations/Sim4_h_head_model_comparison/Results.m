@@ -5,7 +5,7 @@ function [] = Results(output_sourse)
 load('colormap2.mat')
 load('Pseudorand_Net.mat')
 measures_label    = {'auc' 'sens' 'spec' 'prec' 'f1'};
-methods_label     = {'h-hggm-lasso';'h-hggm-ridge';'h-hggm-naive';'eloreta-hggm'};
+methods_label     = {'h-hggm-lasso';'h-hggm-ridge';'h-hggm-naive';'eloreta-hggm';'lcmv-h-hggm'};
 Nmeasures         = length(measures_label);
 %%
 %% h_hggm
@@ -17,16 +17,16 @@ measures_std      = round(100*std(measures,0,3));
 %%
 %%
 process_waitbar = waitbar(0,'Please wait...');
-for meth = 1:4
+for meth = 1:5
     for meas = 1:5
-        waitbar((meth*meas)/(20),process_waitbar,strcat('Outputing results....'));
+        waitbar((meth*meas)/(25),process_waitbar,strcat('Outputing results....'));
         measures_h_hggm{meth,meas}  = [num2str(measures_mean(meth,meas)) '+/-' num2str(measures_std(meth,meas))];
     end
 end
 delete(process_waitbar);
 %%
 %% Table with quality measures
-Table = cell(5,6);
+Table = cell(6,6);
 Table(2:end,1)    = methods_label;
 Table(1,2:end)    = measures_label;
 Table(2:end,2:end)  = measures_h_hggm;
@@ -103,20 +103,6 @@ end
 ylabel('gcv value')
 xlabel('regularization parameter')
 title('eloreta-hggm gcv function')
-
-
-subplot(3,2,5); 
-for sim = 1:Nsim
-    [gcv_opt,idx_gamma]       = min(sol_h_hggm{4,sim}{3});
-    plot(sol_h_hggm{4,1}{2},sol_h_hggm{4,sim}{3},...
-        '-',sol_h_hggm{4,1}{2}(idx_gamma),...
-        gcv_opt,'b*');
-    hold on;
-end
-
-ylabel('gcv value')
-xlabel('regularization parameter')
-title('lcmv-hggm gcv function')
 
 %% Plot corticaL map 
 cortex.vertices = vertices;
