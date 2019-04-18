@@ -43,7 +43,7 @@ Axixi                 = param.Axixi;
 jj_on   = 0;
 xixi_on = 0;
 for k_outer = 1:maxiter_outer
-%     disp(['h-hggm unhide and solve (em) loop # ',num2str(cont_outer)])
+    disp(['h-hggm unhide and solve (em) loop # ',num2str(k_outer)])
     %% Source Posterior Covariance (SPC)
     SigmajjLjv        = Sigmajj*Ljv; % SEC*SDTF'
     LvjSigmajj        = SigmajjLjv'; % Tranconjugated SEC*SDTF'
