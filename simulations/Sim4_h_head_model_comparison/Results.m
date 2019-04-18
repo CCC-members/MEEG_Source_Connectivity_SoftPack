@@ -142,7 +142,7 @@ if strcmp(sens_system,'large') == 1 || strcmp(sens_system,'small') == 1
     caxis([0 1]);
     title('realistic-head model','color','k')
 else
-    subplot(3,2,4); 
+    subplot(3,2,5); 
     patch('Faces',faces,'Vertices',vertices,'FaceVertexCData',J,'FaceColor','interp','Marker','o','MarkerFaceColor','y','EdgeColor',[0.313725501298904 0.313725501298904 0.313725501298904],'FaceAlpha',.95);
     hold on 
     scatter(elec_pos(:,1),elec_pos(:,2),'Marker','.','MarkerFaceColor','k','MarkerEdgeColor','k')

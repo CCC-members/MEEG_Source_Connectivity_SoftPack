@@ -21,19 +21,15 @@ function result = Main_realistic_em_penalty_test(output_sourse)
 
 output_sourse = strcat(output_sourse, filesep,'Realistic_em_penalty_test');
 mkdir(output_sourse);
-
-
-
+ 
 for i = 1:2
-    
+    process_waitbar = waitbar(0,'Please wait...');
     if(i == 1)
         sens_system = 'small';
     else
         sens_system = 'large';
     end
-    
-    process_waitbar = waitbar(0,'Please wait...');
-    waitbar(i/2,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
+    waitbar(1/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
     %%
     if strcmp(sens_system,'large') == 1
         load('HeadModel_large.mat'); % Load mesh vertices (all Lead Fields should be given on homemorph surfaces)
@@ -44,6 +40,7 @@ for i = 1:2
     vertices   = cortex.vertices;
     faces      = cortex.faces;
     %%
+    waitbar(2/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
     %%  Definition of Cortical points
     if strcmp(sens_system,'large') == 1
         load('data_tips24_large.mat')
@@ -61,7 +58,7 @@ for i = 1:2
         Seeders(cont) = pickpoint(vx,vy,vz,vertices,1E-3);
     end
     Seeders      = Seeders(randperm(Nseed));
-    
+    waitbar(3/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
     %%
     if strcmp(sens_system,'large') == 1
         load ('LeadFields_large.mat'); % Load Lead Field cell array (1 X number of Lead Fields)
@@ -124,6 +121,7 @@ for i = 1:2
     Thetajj_est         = zeros(q,q,length(penalty) + 2);
     llh_outer           = cell(1,length(penalty));
     llh_inner           = cell(1,length(penalty));
+    waitbar(4/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
     for cont = 1:length(penalty)
         
         param.penalty  = penalty(cont);
@@ -139,7 +137,7 @@ for i = 1:2
     %% lcmv + hggm
     param.gamma         = sum(abs(diag(Svv)))/(length(Svv)*100);
     [Thetajj_est(:,:,5),Sjj_est] = lcmv_hggm(Svv,Lvj(:,Seeders),param);
-    
+    delete(process_waitbar);
         
     %% Plot Results
     figure_partial_correlations_maps = figure('Position',[182,114,832,521]);
@@ -204,4 +202,5 @@ for i = 1:2
     delete(figure_partial_correlations_maps);
     
 end
+
 end
