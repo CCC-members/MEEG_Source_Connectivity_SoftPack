@@ -25,13 +25,38 @@ classdef h_hggm_simpack < matlab.apps.AppBase
         test_data_sourse
         downloaded
         data_url
+        count
     end
     
     methods (Access = private)
         
         function result = get_test_data(app)
+            app.data_url = [
+                "https://drive.google.com/uc?id=16mBEj8ga90mBvZnWTCtDT-LzH_041E-6",...
+                "https://drive.google.com/uc?id=1BdNvxeCOYSmB5jZt1_ueWcbAaWkSs9HP",...
+                "https://drive.google.com/uc?id=10gCGzTQj0LVVjUk29TmqL5QP_Dit21BY",...
+                "https://drive.google.com/uc?id=1WcFJ07dLDPRAVK4vxWIuMBH8dw5dXnGr",...
+                "https://drive.google.com/uc?id=1onnwMmpqLPF5VH_qYi3PHtSjvim6tlYH",...
+                "https://drive.google.com/uc?id=1qDIifcmFvdI8bTEQCL89cVGIh3qpP84d",...
+                "https://drive.google.com/uc?id=1pk_6KbwEQBqxIq2WMW6ekB_raK3cKrE_",...
+                "https://drive.google.com/uc?id=1yPhC_0ueGJO-Xk55ui1RZ3sNah30Nm2c",...
+                "https://drive.google.com/uc?id=1uQv9cKB4tjfutxKDkgCfcoZUZb-fMQQN",...
+                "https://drive.google.com/uc?id=13R6zqVOHs330gYV8uhjUAunyVBKPXHwR",...
+                "https://drive.google.com/uc?id=1DwJdK3Iulu0fv6urMuCjXmSrvAaQv-0q",...
+                "https://drive.google.com/uc?id=14sQfnBUUo1bVOhujT8Hn3dtMwiUlvmVi",...
+                "https://drive.google.com/uc?id=148wgbdiENxC5hurgiR3RHZsQm411OKrn",...
+                "https://drive.google.com/uc?id=1vNCgYYjY-yzmFYMuZUbTlESUUBOd6-uk",...
+                "https://drive.google.com/uc?id=11yXPfWNwgC9pvUqbRRxJBQ8bFMiyda94",...
+                "https://drive.google.com/uc?id=1eQtQqjUTP5yng8zfXyR6Smg6wpSUz18e"
+                ];
+            
             result = false;
-            if((isempty( app.test_data_sourse) |  app.test_data_sourse==0) & isempty(app.downloaded))
+            file_path = strcat('properties',filesep,'properties.xml');
+            root_tab =  'properties';
+            parameter_name = "data_downloaded";
+            app.count = find_xml_parameter(file_path,root_tab,parameter_name);
+            app.count = string(app.count(1,2));
+            if(app.count ~= "end")
                 answer = questdlg('Did you download the data?', ...
                     'Select data', ...
                     'Yes I did','Download','Cancel','Close');
@@ -70,7 +95,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             msgbox('Completed unpackage!!!','Info');
                             first_file = strcat('EEG_ECOG',filesep,'data',filesep,'4-Head_Model',filesep,'Electrodes',filesep,'EcoG-elecs_Su.mat');
                             if(isfile(first_file))
-                                app.test_data_sourse = fullfile(path,file);
+                                change_xml_parameter(file_path,root_tab,[parameter_name],["end"],cell(0,0));
                                 result = true;
                             else
                                 errordlg('The selected package is not correct!!','Error');
@@ -89,17 +114,34 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         javacomponent(jObj.getComponent, [50,10,150,80], f);
                         jObj.start;
                         pause(1);
-                        
                         try
-                            url = app.data_url;
-                            filename = strcat('H_HGGM_test_data.zip');
-                            options = weboptions('Timeout',Inf,'RequestMethod','get');
-                            outfilename = websave(filename,url,options);
+                            app.count = str2double(app.count);
+                            for i= app.count : length(app.data_url)
+                                disp(strcat("Downloading file ",string(i),"  of ", string(length(app.data_url)) ));
+                                jObj.setBusyText(strcat("Downloading file ",string(i),"  of ", string(length(app.data_url)) ));
+                                url =  app.data_url(i);
+                                last = string(i);
+                                if(i<10)
+                                    last = strcat('0',string(i));
+                                end
+                                filename = strcat('H_HGGM_test_data.z',last);
+                                if(i == length(app.data_url))
+                                    filename = strcat('H_HGGM_test_data.zip');
+                                end
+                                options = weboptions('Timeout',Inf,'RequestMethod','get');
+                                outfilename = websave(filename,url,options);
+                                pause(1);
+                                app.count = i;
+                                change_xml_parameter(file_path,root_tab,[parameter_name],[string(i)],cell(0,0));
+                            end
+                            change_xml_parameter(file_path,root_tab,[parameter_name],["end"],cell(0,0));
                         catch
                             delete(f);
-                            errordlg('Download error!!!','Error');
+                            error_file =app.count + 1;
+                            errordlg(srtcat("Download error in file: " , string(error_file)),'Error');
                             return;
                         end
+                        pause(1);
                         jObj.setBusyText('Unpacking test data...');
                         try
                             exampleFiles = unzip(filename,pwd);
@@ -114,13 +156,22 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         delete(f);
                         msgbox('Completed download!!!','Info');
                         result = true;
-                        app.downloaded = true;
                     case 'Cancel'
                         result = false;
                         return;
                 end
             else
-                result = true;
+                
+                 answer = questdlg('The test data has already been downloaded previously! Do you want to download again?', ...
+                    'Select data', ...
+                    'Yes I want','No','Cancel');
+                switch answer
+                    case 'Yes I want'
+                        change_xml_parameter(file_path,root_tab,[parameter_name],["1"],cell(0,0));
+                        get_test_data(app);
+                    case 'No'
+                        return;
+                 end
             end
         end
     end
@@ -134,6 +185,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             clear all;
             close all;
             addpath('common_functions');
+            addpath('properties');
             addpath('EEG_ECOG');
             addpath('simulations/Sim1_hggm_convergence&jankova_conditions');
             addpath('simulations/Sim2_h_hggm_simplified_head_model');
@@ -142,8 +194,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             addpath('simulations/Sim_data');
             addpath('ssvep');
             
-            app.downloaded = false;
-            app.data_url = "https://drive.google.com/uc?id=1QLl5ZmCqVf9JDzhpxxUfFM6-4rmmtTM6";
+            
         end
 
         % Menu selected function: ExitMenu
