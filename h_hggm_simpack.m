@@ -30,7 +30,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
     
     methods (Access = private)
         
-        function result = get_test_data(app)
+        function result = get_test_data(app,simuling)
             app.data_url = [
                 "https://drive.google.com/uc?id=16mBEj8ga90mBvZnWTCtDT-LzH_041E-6",...
                 "https://drive.google.com/uc?id=1BdNvxeCOYSmB5jZt1_ueWcbAaWkSs9HP",...
@@ -160,18 +160,22 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         result = false;
                         return;
                 end
-            else
-                
-                 answer = questdlg('The test data has already been downloaded previously! Do you want to download again?', ...
-                    'Select data', ...
-                    'Yes I want','No','Cancel');
-                switch answer
-                    case 'Yes I want'
-                        change_xml_parameter(file_path,root_tab,[parameter_name],["1"],cell(0,0));
-                        get_test_data(app);
-                    case 'No'
-                        return;
-                 end
+            else  
+                if(~simuling)
+                    answer = questdlg('The test data has already been downloaded previously! Do you want to download again?', ...
+                        'Select data', ...
+                        'Yes I want','No','Cancel');
+                    switch answer
+                        case 'Yes I want'
+                            change_xml_parameter(file_path,root_tab,[parameter_name],["1"],cell(0,0));
+                            get_test_data(app,false);
+                        case 'No'
+                            result = true;
+                            return;
+                    end
+                else
+                    result = true;
+                end
             end
         end
     end
@@ -204,7 +208,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HGGMConvergenceJankovaConditionsMenu
         function HGGMConvergenceJankovaConditionsMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -218,7 +222,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: SSVEPMenu
         function SSVEPMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -232,7 +236,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMSimplifiedHeadModelMenu
         function HHGGMSimplifiedHeadModelMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -246,7 +250,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMRealisticHeadModelMenu
         function HHGGMRealisticHeadModelMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -260,7 +264,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMHeadModelComparisonMenu
         function HHGGMHeadModelComparisonMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -283,7 +287,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: AllAnalyzeMenu
         function AllAnalyzeMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -302,7 +306,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: EEGECOGMenu
         function EEGECOGMenuSelected(app, event)
-            if(get_test_data(app))
+            if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
                     if(app.output_sourse==0)
@@ -317,7 +321,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
         % Menu selected function: TestdatasourceMenu
         function TestdatasourceMenuSelected(app, event)
             
-            get_test_data(app);
+            get_test_data(app,false);
             
         end
     end
