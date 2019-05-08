@@ -152,10 +152,10 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             change_xml_parameter(file_path,root_tab,[parameter_name],["end"],cell(0,0));
                         catch
                             delete(f);
-                            error_file =app.count + 1;
-                            error_msg = srtcat("Download error in file: " , string(error_file));
-                            errordlg(char(error_msg),'Error');
-                            return;
+                            error_file =double(app.count) + 1;
+                            error_msg = strcat('Download error in file: ' , error_file);
+                            errordlg(error_msg,'Error');
+                            return;                            
                         end
                         pause(1);
                         jObj.setBusyText('Unpacking test data...');
