@@ -69,7 +69,7 @@ elec                  = load(['EEG_ECOG',filesep,'data',filesep,'4-Head_Model',f
 elec                  = elec.electrodes;
 %  Cross-spectra
 waitbar(3/4,process_waitbar,strcat('Cross-spectra...' ));
-[Svv_full,F,Ns,psd]   = xspectrum(data,fs,80,deltaf);
+[Svv_full,F,Ns,psd]   = xspectrum(data,fs,80,deltaf,6);
 %  Pick frequency bins for analysis 
 waitbar(3/4,process_waitbar,strcat('Pick frequency bins for analysis ' ));
 peak_pos              = find(F == peak_pos1):find(F == peak_pos2);
@@ -191,7 +191,7 @@ elec            = load(['EEG_ECOG',filesep,'data',filesep,'4-Head_Model',filesep
 elec            = elec.electrodes;
 %  Cross-spectra
 waitbar(2/3,process_waitbar,strcat('Cross-spectra' ));
-[Svv_full,F,Ns,psd] = xspectrum(data,fs,80,deltaf);
+[Svv_full,F,Ns,psd] = xspectrum(data,fs,80,deltaf,6);
 %  Pick frequency bins for analysis 
 waitbar(2/3,process_waitbar,strcat('Pick frequency bins for analysis ' ));
 peak_pos              = find(F == peak_pos1):find(F == peak_pos2);

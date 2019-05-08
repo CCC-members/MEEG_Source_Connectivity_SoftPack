@@ -82,7 +82,7 @@ for cond = 1:length(freq_list)
     %%
     %% Cross-spectra
     fmax                              = 2*freq_list{cond} +5;
-    [Svv_full,F,Ns,PSD]               = xspectrum(data_EEG_task,fs,fmax,deltaf);
+    [Svv_full,F,Ns,PSD]               = xspectrum(data_EEG_task,fs,fmax,deltaf,1);
     %%
     %% Applying average reference
     Nf = length(F);
