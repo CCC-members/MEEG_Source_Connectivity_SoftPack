@@ -4,8 +4,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
     properties (Access = public)
         HHGGMSimulationPackUIFigure   matlab.ui.Figure
         FileMenu                      matlab.ui.container.Menu
-        TestdatasourceMenu            matlab.ui.container.Menu
-        OutputsourceMenu              matlab.ui.container.Menu
+        SelectdatafileMenu            matlab.ui.container.Menu
+        SelectoutputfolderMenu        matlab.ui.container.Menu
         ExitMenu                      matlab.ui.container.Menu
         ToolsMenu                     matlab.ui.container.Menu
         HGGMMenu                      matlab.ui.container.Menu
@@ -178,6 +178,19 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                 end
             end
         end
+        
+        function results = difine_paths(app)
+            clc;           
+            addpath('common_functions');
+            addpath('properties');
+            addpath('EEG_ECOG');
+            addpath('simulations/Sim1_hggm_convergence&jankova_conditions');
+            addpath('simulations/Sim2_h_hggm_simplified_head_model');
+            addpath('simulations/Sim3_h_hggm_realistic_head_model');
+            addpath('simulations/Sim4_h_head_model_comparison');
+            addpath('simulations/Sim_data');
+            addpath('ssvep');
+        end
     end
     
 
@@ -208,6 +221,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HGGMConvergenceJankovaConditionsMenu
         function HGGMConvergenceJankovaConditionsMenuSelected(app, event)
+            difine_paths(app)
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -222,6 +236,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: SSVEPMenu
         function SSVEPMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -236,6 +251,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMSimplifiedHeadModelMenu
         function HHGGMSimplifiedHeadModelMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -250,6 +266,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMRealisticHeadModelMenu
         function HHGGMRealisticHeadModelMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -264,6 +281,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMHeadModelComparisonMenu
         function HHGGMHeadModelComparisonMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -276,8 +294,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             end
         end
 
-        % Menu selected function: OutputsourceMenu
-        function OutputsourceMenuSelected(app, event)
+        % Menu selected function: SelectoutputfolderMenu
+        function SelectoutputfolderMenuSelected(app, event)
             app.output_sourse = uigetdir('tittle','Select the Source Folder');
             if(app.output_sourse==0)
                 return;
@@ -287,6 +305,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: AllAnalyzeMenu
         function AllAnalyzeMenuSelected(app, event)
+            difine_paths(app)
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -306,6 +325,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: EEGECOGMenu
         function EEGECOGMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -318,8 +338,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             end
         end
 
-        % Menu selected function: TestdatasourceMenu
-        function TestdatasourceMenuSelected(app, event)
+        % Menu selected function: SelectdatafileMenu
+        function SelectdatafileMenuSelected(app, event)
             
             get_test_data(app,false);
             
@@ -341,15 +361,15 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             app.FileMenu = uimenu(app.HHGGMSimulationPackUIFigure);
             app.FileMenu.Text = 'File';
 
-            % Create TestdatasourceMenu
-            app.TestdatasourceMenu = uimenu(app.FileMenu);
-            app.TestdatasourceMenu.MenuSelectedFcn = createCallbackFcn(app, @TestdatasourceMenuSelected, true);
-            app.TestdatasourceMenu.Text = 'Test data source';
+            % Create SelectdatafileMenu
+            app.SelectdatafileMenu = uimenu(app.FileMenu);
+            app.SelectdatafileMenu.MenuSelectedFcn = createCallbackFcn(app, @SelectdatafileMenuSelected, true);
+            app.SelectdatafileMenu.Text = 'Select data file';
 
-            % Create OutputsourceMenu
-            app.OutputsourceMenu = uimenu(app.FileMenu);
-            app.OutputsourceMenu.MenuSelectedFcn = createCallbackFcn(app, @OutputsourceMenuSelected, true);
-            app.OutputsourceMenu.Text = 'Output source';
+            % Create SelectoutputfolderMenu
+            app.SelectoutputfolderMenu = uimenu(app.FileMenu);
+            app.SelectoutputfolderMenu.MenuSelectedFcn = createCallbackFcn(app, @SelectoutputfolderMenuSelected, true);
+            app.SelectoutputfolderMenu.Text = 'Select output folder';
 
             % Create ExitMenu
             app.ExitMenu = uimenu(app.FileMenu);
