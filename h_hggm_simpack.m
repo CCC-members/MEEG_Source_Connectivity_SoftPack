@@ -132,14 +132,14 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                                 
                                 % ------Downloding the .zip file  ----
                                 outfilename = websave(filename,url,options);
-                                s = dir(filename);
+                                s = dir(char(filename));
                                 pause(1);
                                 
                                 % ----- Checking if the .zip file is correct
                                 if(i ~= length(app.data_url))
-                                    while(s.bytes ~= 52428800)                                        
+                                    while(s.bytes ~= 52428800)
                                         outfilename = websave(filename,url,options);
-                                        s = dir(filename);                                        
+                                        s = dir(filename);
                                         pause(1);
                                     end
                                 end
