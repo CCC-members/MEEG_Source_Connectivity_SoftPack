@@ -129,7 +129,22 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                                     filename = strcat('H_HGGM_test_data.zip');
                                 end
                                 options = weboptions('Timeout',Inf,'RequestMethod','get');
+                                
+                                % ------Downloding the .zip file  ----
                                 outfilename = websave(filename,url,options);
+                                s = dir(filename);
+                                pause(1);
+                                
+                                % ----- Checking if the .zip file is correct
+                                if(i ~= length(app.data_url))
+                                    while(s.bytes ~= 52428800)                                        
+                                        outfilename = websave(filename,url,options);
+                                        s = dir(filename);                                        
+                                        pause(1);
+                                    end
+                                end
+                                
+                                % ------ Updating the downloaded file number in properties file
                                 pause(1);
                                 app.count = i;
                                 change_xml_parameter(file_path,root_tab,[parameter_name],[string(i)],cell(0,0));
@@ -144,7 +159,33 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         pause(1);
                         jObj.setBusyText('Unpacking test data...');
                         try
-                            exampleFiles = unzip(filename,pwd);
+                            % ------  Umpacking multi-pack Zip Package
+                            source_7z = ['C:',filesep,'Program Files (x86)',filesep,'7-Zip',filesep,'7z.exe'];
+                            surce_zip = [pwd,filesep,'H_HGGM_test_data.zip'];
+                            
+                            if(isfile(source_7z))
+                                [status,result] = system(['"',source_7z,'"  x -y '  '"',surce_zip,'"' ]);
+                                disp([status,result] );
+                            else
+                                % --- Downloading 7-Zip to install
+                                zip_intaller_url =  'https://drive.google.com/open?id=1DJbV6_155hAvaTzmRyiewEPRXgUADWfI';
+                                zip_installer_name = '7z1900.zip';
+                                
+                                outfilename = websave(zip_installer_name,zip_intaller_url);
+                                pause(1);
+                                exampleFiles = unzip(zip_installer_name,pwd);
+                                pause(1);
+                                % --- Installing 7-Zip in the PC
+                                command = [pwd,filesep,'7z1900.exe']; %// external program; full path
+                                [status,cmdout] = system([command ' & '])
+                                
+                                while(~isfile(source_7z))
+                                    pause(2);
+                                end
+                                [status,result] = system(['"',source_7z,'"  x -y '  '"',surce_zip,'"' ]);
+                                disp([status,result] );
+                            end
+                            
                         catch
                             delete(f);
                             errordlg('Unpackage error!!!','Error');
@@ -160,7 +201,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         result = false;
                         return;
                 end
-            else  
+            else
                 if(~simuling)
                     answer = questdlg('The test data has already been downloaded previously! Do you want to download again?', ...
                         'Select data', ...
@@ -180,7 +221,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
         end
         
         function results = difine_paths(app)
-            clc;           
+            clc;
             addpath('common_functions');
             addpath('properties');
             addpath('EEG_ECOG');
