@@ -153,7 +153,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         catch
                             delete(f);
                             error_file =app.count + 1;
-                            errordlg(srtcat("Download error in file: " , string(error_file)),'Error');
+                            error_msg = srtcat("Download error in file: " , string(error_file));
+                            errordlg(char(error_msg),'Error');
                             return;
                         end
                         pause(1);
