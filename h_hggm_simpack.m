@@ -115,78 +115,29 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         jObj.start;
                         pause(1);
                         try
-                            app.count = str2double(app.count);
-                            for i= app.count : length(app.data_url)
-                                disp(strcat("Downloading file ",string(i),"  of ", string(length(app.data_url)) ));
-                                jObj.setBusyText(strcat("Downloading file ",string(i),"  of ", string(length(app.data_url)) ));
-                                url =  app.data_url(i);
-                                last = string(i);
-                                if(i<10)
-                                    last = strcat('0',string(i));
-                                end
-                                filename = strcat('H_HGGM_test_data.z',last);
-                                if(i == length(app.data_url))
-                                    filename = strcat('H_HGGM_test_data.zip');
-                                end
-                                options = weboptions('Timeout',Inf,'RequestMethod','get');
-                                
-                                % ------Downloding the .zip file  ----
-                                outfilename = websave(filename,url,options);
-                                s = dir(char(filename));
-                                pause(1);
-                                
-                                % ----- Checking if the .zip file is correct
-                                if(i ~= length(app.data_url))
-                                    while(s.bytes ~= 52428800)
-                                        outfilename = websave(filename,url,options);
-                                        s = dir(filename);
-                                        pause(1);
-                                    end
-                                end
-                                
-                                % ------ Updating the downloaded file number in properties file
-                                pause(1);
-                                app.count = i;
-                                change_xml_parameter(file_path,root_tab,[parameter_name],[string(i)],cell(0,0));
-                            end
+                            disp(strcat("Downloading file......."));
+                            jObj.setBusyText(strcat("Downloading file....... "));
+                            
+                            filename = strcat('H_HGGM_test_data.zip');
+                            url = 'https://lstneuro-my.sharepoint.com/:u:/g/personal/joint-lab_neuroinformatics-collaboratory_org/Eae6DTYQUbNFgNDDPTbGIL8BRJU0LWXw1vb-qKXqgvCqHA??download=1';
+                            matlab.net.http.HTTPOptions.VerifyServerName = false;
+                            options = weboptions('Timeout',Inf,'RequestMethod','get' );
+                            outfilename = websave(filename,url,options);
+                              
                             change_xml_parameter(file_path,root_tab,[parameter_name],["end"],cell(0,0));
                         catch
                             delete(f);
-                            error_file =double(app.count) + 1;
-                            error_msg = strcat('Download error in file: ' , error_file);
+%                             error_file =double(app.count) + 1;
+                            error_msg = strcat('Download error .... ');
                             errordlg(error_msg,'Error');
                             return;                            
                         end
                         pause(1);
                         jObj.setBusyText('Unpacking test data...');
-                        try
-                            % ------  Umpacking multi-pack Zip Package
-                            source_7z = ['C:',filesep,'Program Files (x86)',filesep,'7-Zip',filesep,'7z.exe'];
-                            surce_zip = [pwd,filesep,'H_HGGM_test_data.zip'];
-                            
-                            if(isfile(source_7z))
-                                [status,result] = system(['"',source_7z,'"  x -y '  '"',surce_zip,'"' ]);
-                                disp([status,result] );
-                            else
-                                % --- Downloading 7-Zip to install
-                                zip_intaller_url =  'https://drive.google.com/open?id=1DJbV6_155hAvaTzmRyiewEPRXgUADWfI';
-                                zip_installer_name = '7z1900.zip';
-                                
-                                outfilename = websave(zip_installer_name,zip_intaller_url);
-                                pause(1);
-                                exampleFiles = unzip(zip_installer_name,pwd);
-                                pause(1);
-                                % --- Installing 7-Zip in the PC
-                                command = [pwd,filesep,'7z1900.exe']; %// external program; full path
-                                [status,cmdout] = system([command ' & '])
-                                
-                                while(~isfile(source_7z))
-                                    pause(2);
-                                end
-                                [status,result] = system(['"',source_7z,'"  x -y '  '"',surce_zip,'"' ]);
-                                disp([status,result] );
-                            end
-                            
+                        try 
+                            exampleFiles = unzip(filename,pwd);
+                            pause(1);
+                            delete(filename);
                         catch
                             delete(f);
                             errordlg('Unpackage error!!!','Error');
