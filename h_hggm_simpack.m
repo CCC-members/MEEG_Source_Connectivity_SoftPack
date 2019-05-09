@@ -64,6 +64,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             jObj.start;
                             pause(1);
                             try
+                                disp(strcat("Unpacking test data......"));
                                 exampleFiles = unzip(fullfile(path,file),pwd);
                             catch
                                 delete(f);
@@ -72,6 +73,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             end
                             jObj.stop;
                             jObj.setBusyText('All done!');
+                            disp(strcat("All done!"));
                             pause(2);
                             delete(f);
                             msgbox('Completed unpackage!!!','Info');
@@ -116,6 +118,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         end
                         pause(1);
                         jObj.setBusyText('Unpacking test data...');
+                         disp(strcat("Unpacking test data......"));
                         try 
                             exampleFiles = unzip(filename,pwd);
                             pause(1);
@@ -127,6 +130,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         end
                         jObj.stop;
                         jObj.setBusyText('All done!');
+                        disp(strcat("All done!"));
                         pause(2);
                         delete(f);
                         msgbox('Completed download!!!','Info');
