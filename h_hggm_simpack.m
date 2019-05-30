@@ -103,7 +103,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             jObj.setBusyText(strcat("Downloading file....... "));
                             
                             filename = strcat('H_HGGM_test_data.zip');
-                            url = 'https://lstneuro-my.sharepoint.com/:u:/g/personal/joint-lab_neuroinformatics-collaboratory_org/Eae6DTYQUbNFgNDDPTbGIL8BRJU0LWXw1vb-qKXqgvCqHA?download=1';
+                            url = 'https://lstneuro-my.sharepoint.com/:u:/g/personal/cc-lab_neuroinformatics-collaboratory_org/Eae6DTYQUbNFgNDDPTbGIL8BRJU0LWXw1vb-qKXqgvCqHA?download=1';
                             matlab.net.http.HTTPOptions.VerifyServerName = false;
                             options = weboptions('Timeout',Inf,'RequestMethod','get' );
                             outfilename = websave(filename,url,options);
