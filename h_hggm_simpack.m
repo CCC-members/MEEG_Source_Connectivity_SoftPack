@@ -53,6 +53,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             disp(['User selected ', fullfile(path,file)]);
                             f = dialog('Position',[300 300 250 80]);
                             
+                            define_ico(f);
+                           
                             iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
                             iconsSizeEnums = javaMethod('values',iconsClassName);
                             SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
@@ -87,6 +89,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         end
                     case 'Download'
                         f = dialog('Position',[300 300 250 80]);
+                        
+                        define_ico(f);
                         
                         iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
                         iconsSizeEnums = javaMethod('values',iconsClassName);
