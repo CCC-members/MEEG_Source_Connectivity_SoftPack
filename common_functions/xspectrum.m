@@ -1,4 +1,4 @@
-function [Svv,F,Ns,PSD] = xspectrum(data,Fs,Fm,deltaf,Nw)
+function [Svv,F,Ns,PSD] = xspectrum(data,Fs,Fm,deltaf,Nw,band)
 % xspectrum estimates the Cross Spectrum of the input M/EEG data
 % Inputs:
 %    data     = M/EEG data matrix, in which every row is a channel

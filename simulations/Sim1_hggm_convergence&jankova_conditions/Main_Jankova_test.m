@@ -24,8 +24,6 @@ function result = Main_Jankova_test(output_sourse)
 
 %% Initialize generator parameters
 
-
-
 output_sourse = strcat(output_sourse, filesep,'Jankova_test');
 if(~isfolder(output_sourse))
 mkdir(output_sourse);
