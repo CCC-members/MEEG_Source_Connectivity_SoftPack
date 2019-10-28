@@ -1,4 +1,9 @@
 function [S,Data,X] = gen_hggm1(m,q,nblocks,options)
+%% Hermitian Gaussian Graphical Model generator 
+%  the gaussian engine samples come from a random binary precision matrix
+%  the precision matrix is defined as a block structure with overlaping
+%  diagonal blocks with random sizes 
+%%
 % Pedro Valdes-Sosa, Oct 2017
 % Deirel Paz Linares, Oct 2017
 % Eduardo Gonzalez-Moreira, Oct 2017

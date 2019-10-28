@@ -1,6 +1,4 @@
-function result = Main_H_HGGM_Head_Model_Comparison(output_sourse)
-
-
+function result = Main_HIGGS_Head_Model_Comparison(output_source)
 %%
 % Authors:
 % - Deirel Paz Linares
@@ -9,21 +7,19 @@ function result = Main_H_HGGM_Head_Model_Comparison(output_sourse)
 
 % Date: April 4, 2019
 
-
 % Updates
 % - Ariosky Areces Gonzalez
 
 % Date: April 4, 2019
 
-
-output_sourse = strcat(output_sourse, filesep,'H_HGGM_Head_Model_Comparison');
-if(~isfolder(output_sourse))
-mkdir(output_sourse);
+output_source = strcat(output_source, filesep,'HIGGS_Head_Model_Comparison');
+if(~isfolder(output_source))
+mkdir(output_source);
 end
 
 %% Input Lead Field model
 
-for i = 1:3
+for i = 1:2
     
     if(i == 1)
         sens_system = 'pseudo';
@@ -32,18 +28,12 @@ for i = 1:3
     else
         sens_system = 'large';
     end
-   
-    
-    %% Simulation
-    Simulation(sens_system, output_sourse);
-    
 
+%% Simulation
+Simulation(sens_system, output_source);
 %% Inverse Solvers
-
-InverseSolvers(output_sourse);
+InverseSolvers(output_source);
 %%
 %% Results
-
-Results(output_sourse);
-
+Results(output_source);
 end

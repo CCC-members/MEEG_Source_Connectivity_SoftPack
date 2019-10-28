@@ -1,4 +1,10 @@
-function [S,Data,X] = gen_hggm2(n,q,options)
+function [S,Data,X] = gen_hggm2(m,q,options)
+%% Hermitian Gaussian Graphical Model generator 
+%  the gaussian engine samples come from a random binary precision matrix
+%  the precision matrix is defined as a block structure with nonoverlaping
+%  diagonal blocks with size defined in options and given off-diagonal nonzero 
+%  blocks defined in options 
+%%
 % Pedro Valdes-Sosa, Oct 2017
 % Deirel Paz Linares, Oct 2017
 % Eduardo Gonzalez-Moreira, Oct 2017
@@ -49,9 +55,9 @@ end
 %% Applying isomorphism and generating data
 W           = eye(q)/X;
 Wisomph     = [real(W) -imag(W); imag(W) real(W)];
-Data_isomph = mvnrnd(zeros(1,2*q),Wisomph,n);
+Data_isomph = mvnrnd(zeros(1,2*q),Wisomph,m);
 DataRe      = Data_isomph(:,1:q);
 DataIm      = Data_isomph(:,q+1:2*q);
 Data        = DataRe + 1i*DataIm;
 Data        = transpose(Data);
-S           = (1/n)*(Data*Data');
+S           = (1/m)*(Data*Data');

@@ -4,8 +4,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
     properties (Access = public)
         HHGGMSimulationPackUIFigure   matlab.ui.Figure
         FileMenu                      matlab.ui.container.Menu
-        TestdatasourceMenu            matlab.ui.container.Menu
-        OutputsourceMenu              matlab.ui.container.Menu
+        SelectdatafileMenu            matlab.ui.container.Menu
+        SelectoutputfolderMenu        matlab.ui.container.Menu
         ExitMenu                      matlab.ui.container.Menu
         ToolsMenu                     matlab.ui.container.Menu
         HGGMMenu                      matlab.ui.container.Menu
@@ -31,25 +31,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
     methods (Access = private)
         
         function result = get_test_data(app,simuling)
-            app.data_url = [
-                "https://drive.google.com/uc?id=16mBEj8ga90mBvZnWTCtDT-LzH_041E-6",...
-                "https://drive.google.com/uc?id=1BdNvxeCOYSmB5jZt1_ueWcbAaWkSs9HP",...
-                "https://drive.google.com/uc?id=10gCGzTQj0LVVjUk29TmqL5QP_Dit21BY",...
-                "https://drive.google.com/uc?id=1WcFJ07dLDPRAVK4vxWIuMBH8dw5dXnGr",...
-                "https://drive.google.com/uc?id=1onnwMmpqLPF5VH_qYi3PHtSjvim6tlYH",...
-                "https://drive.google.com/uc?id=1qDIifcmFvdI8bTEQCL89cVGIh3qpP84d",...
-                "https://drive.google.com/uc?id=1pk_6KbwEQBqxIq2WMW6ekB_raK3cKrE_",...
-                "https://drive.google.com/uc?id=1yPhC_0ueGJO-Xk55ui1RZ3sNah30Nm2c",...
-                "https://drive.google.com/uc?id=1uQv9cKB4tjfutxKDkgCfcoZUZb-fMQQN",...
-                "https://drive.google.com/uc?id=13R6zqVOHs330gYV8uhjUAunyVBKPXHwR",...
-                "https://drive.google.com/uc?id=1DwJdK3Iulu0fv6urMuCjXmSrvAaQv-0q",...
-                "https://drive.google.com/uc?id=14sQfnBUUo1bVOhujT8Hn3dtMwiUlvmVi",...
-                "https://drive.google.com/uc?id=148wgbdiENxC5hurgiR3RHZsQm411OKrn",...
-                "https://drive.google.com/uc?id=1vNCgYYjY-yzmFYMuZUbTlESUUBOd6-uk",...
-                "https://drive.google.com/uc?id=11yXPfWNwgC9pvUqbRRxJBQ8bFMiyda94",...
-                "https://drive.google.com/uc?id=1eQtQqjUTP5yng8zfXyR6Smg6wpSUz18e"
-                ];
-            
+           
             result = false;
             file_path = strcat('properties',filesep,'properties.xml');
             root_tab =  'properties';
@@ -71,6 +53,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             disp(['User selected ', fullfile(path,file)]);
                             f = dialog('Position',[300 300 250 80]);
                             
+                            define_ico(f);
+                           
                             iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
                             iconsSizeEnums = javaMethod('values',iconsClassName);
                             SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
@@ -82,6 +66,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             jObj.start;
                             pause(1);
                             try
+                                disp(strcat("Unpacking test data......"));
                                 exampleFiles = unzip(fullfile(path,file),pwd);
                             catch
                                 delete(f);
@@ -90,6 +75,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                             end
                             jObj.stop;
                             jObj.setBusyText('All done!');
+                            disp(strcat("All done!"));
                             pause(2);
                             delete(f);
                             msgbox('Completed unpackage!!!','Info');
@@ -104,6 +90,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                     case 'Download'
                         f = dialog('Position',[300 300 250 80]);
                         
+                        define_ico(f);
+                        
                         iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
                         iconsSizeEnums = javaMethod('values',iconsClassName);
                         SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
@@ -115,36 +103,30 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         jObj.start;
                         pause(1);
                         try
-                            app.count = str2double(app.count);
-                            for i= app.count : length(app.data_url)
-                                disp(strcat("Downloading file ",string(i),"  of ", string(length(app.data_url)) ));
-                                jObj.setBusyText(strcat("Downloading file ",string(i),"  of ", string(length(app.data_url)) ));
-                                url =  app.data_url(i);
-                                last = string(i);
-                                if(i<10)
-                                    last = strcat('0',string(i));
-                                end
-                                filename = strcat('H_HGGM_test_data.z',last);
-                                if(i == length(app.data_url))
-                                    filename = strcat('H_HGGM_test_data.zip');
-                                end
-                                options = weboptions('Timeout',Inf,'RequestMethod','get');
-                                outfilename = websave(filename,url,options);
-                                pause(1);
-                                app.count = i;
-                                change_xml_parameter(file_path,root_tab,[parameter_name],[string(i)],cell(0,0));
-                            end
+                            disp(strcat("Downloading file......."));
+                            jObj.setBusyText(strcat("Downloading file....... "));
+                            
+                            filename = strcat('H_HGGM_test_data.zip');
+                            url = 'https://lstneuro-my.sharepoint.com/:u:/g/personal/cc-lab_neuroinformatics-collaboratory_org/Eae6DTYQUbNFgNDDPTbGIL8BRJU0LWXw1vb-qKXqgvCqHA?download=1';
+                            matlab.net.http.HTTPOptions.VerifyServerName = false;
+                            options = weboptions('Timeout',Inf,'RequestMethod','get' );
+                            outfilename = websave(filename,url,options);
+                              
                             change_xml_parameter(file_path,root_tab,[parameter_name],["end"],cell(0,0));
                         catch
                             delete(f);
-                            error_file =app.count + 1;
-                            errordlg(srtcat("Download error in file: " , string(error_file)),'Error');
-                            return;
+%                             error_file =double(app.count) + 1;
+                            error_msg = strcat('Download error .... ');
+                            errordlg(error_msg,'Error');
+                            return;                            
                         end
                         pause(1);
                         jObj.setBusyText('Unpacking test data...');
-                        try
+                         disp(strcat("Unpacking test data......"));
+                        try 
                             exampleFiles = unzip(filename,pwd);
+                            pause(1);
+                            delete(filename);
                         catch
                             delete(f);
                             errordlg('Unpackage error!!!','Error');
@@ -152,6 +134,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         end
                         jObj.stop;
                         jObj.setBusyText('All done!');
+                        disp(strcat("All done!"));
                         pause(2);
                         delete(f);
                         msgbox('Completed download!!!','Info');
@@ -160,7 +143,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         result = false;
                         return;
                 end
-            else  
+            else
                 if(~simuling)
                     answer = questdlg('The test data has already been downloaded previously! Do you want to download again?', ...
                         'Select data', ...
@@ -177,6 +160,19 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                     result = true;
                 end
             end
+        end
+        
+        function results = difine_paths(app)
+            clc;
+            addpath('common_functions');
+            addpath('properties');
+            addpath('EEG_ECOG');
+            addpath('simulations/Sim1_hggm_convergence&jankova_conditions');
+            addpath('simulations/Sim2_h_hggm_simplified_head_model');
+            addpath('simulations/Sim3_h_hggm_realistic_head_model');
+            addpath('simulations/Sim4_h_head_model_comparison');
+            addpath('simulations/Sim_data');
+            addpath('ssvep');
         end
     end
     
@@ -208,6 +204,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HGGMConvergenceJankovaConditionsMenu
         function HGGMConvergenceJankovaConditionsMenuSelected(app, event)
+            difine_paths(app)
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -222,6 +219,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: SSVEPMenu
         function SSVEPMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -236,6 +234,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMSimplifiedHeadModelMenu
         function HHGGMSimplifiedHeadModelMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -250,6 +249,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMRealisticHeadModelMenu
         function HHGGMRealisticHeadModelMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -264,6 +264,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: HHGGMHeadModelComparisonMenu
         function HHGGMHeadModelComparisonMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -271,13 +272,13 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         return;
                     end
                 end
-                Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
+                Main_HIGGS_Head_Model_Comparison(app.output_sourse);
                 msgbox('Completed operation','Info');
             end
         end
 
-        % Menu selected function: OutputsourceMenu
-        function OutputsourceMenuSelected(app, event)
+        % Menu selected function: SelectoutputfolderMenu
+        function SelectoutputfolderMenuSelected(app, event)
             app.output_sourse = uigetdir('tittle','Select the Source Folder');
             if(app.output_sourse==0)
                 return;
@@ -287,6 +288,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: AllAnalyzeMenu
         function AllAnalyzeMenuSelected(app, event)
+            difine_paths(app)
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -306,6 +308,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
 
         % Menu selected function: EEGECOGMenu
         function EEGECOGMenuSelected(app, event)
+            difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
                     app.output_sourse = uigetdir('tittle','Select the Output Folder');
@@ -318,11 +321,9 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             end
         end
 
-        % Menu selected function: TestdatasourceMenu
-        function TestdatasourceMenuSelected(app, event)
-            
+        % Menu selected function: SelectdatafileMenu
+        function SelectdatafileMenuSelected(app, event)
             get_test_data(app,false);
-            
         end
     end
 
@@ -341,15 +342,15 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             app.FileMenu = uimenu(app.HHGGMSimulationPackUIFigure);
             app.FileMenu.Text = 'File';
 
-            % Create TestdatasourceMenu
-            app.TestdatasourceMenu = uimenu(app.FileMenu);
-            app.TestdatasourceMenu.MenuSelectedFcn = createCallbackFcn(app, @TestdatasourceMenuSelected, true);
-            app.TestdatasourceMenu.Text = 'Test data source';
+            % Create SelectdatafileMenu
+            app.SelectdatafileMenu = uimenu(app.FileMenu);
+            app.SelectdatafileMenu.MenuSelectedFcn = createCallbackFcn(app, @SelectdatafileMenuSelected, true);
+            app.SelectdatafileMenu.Text = 'Select data file';
 
-            % Create OutputsourceMenu
-            app.OutputsourceMenu = uimenu(app.FileMenu);
-            app.OutputsourceMenu.MenuSelectedFcn = createCallbackFcn(app, @OutputsourceMenuSelected, true);
-            app.OutputsourceMenu.Text = 'Output source';
+            % Create SelectoutputfolderMenu
+            app.SelectoutputfolderMenu = uimenu(app.FileMenu);
+            app.SelectoutputfolderMenu.MenuSelectedFcn = createCallbackFcn(app, @SelectoutputfolderMenuSelected, true);
+            app.SelectoutputfolderMenu.Text = 'Select output folder';
 
             % Create ExitMenu
             app.ExitMenu = uimenu(app.FileMenu);

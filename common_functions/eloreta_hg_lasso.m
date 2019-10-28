@@ -1,22 +1,16 @@
-function [Thetajj,Sjj,gamma_grid,gamma,gcv] = eloreta_hggm(Svv,Lvj,param)
+function [Thetajj,Sjj,gamma_grid,gamma,gcv] = eloreta_hg_lasso(Svv,Lvj,param)
 p             = size(Lvj,1);
-q             = size(Lvj,2);
 Ip            = eye(p);
-Iq            = eye(q);
-maxiter_inner = param.maxiter_inner;
-m             = param.m;
-aj            = sqrt(log(q)/m);
-rth           = param.rth;
-Ajj_diag      = 0;
-Ajj_ndiag     = 1;
-Ajj           = Ajj_diag*eye(q)+Ajj_ndiag*(ones(q)-eye(q));
+scaleLvj      = sqrt(sum(abs(diag(Lvj*Lvj')))/p);
+Lvj           = Lvj/scaleLvj;
+scaleV        = (sum(abs(diag(Svv)))/p);
+Svv           = Svv/scaleV;
 gamma1        = param.gamma1;
 gamma2        = param.gamma2;
 delta_gamma   = param.delta_gamma;
 gamma_grid    = gamma1:delta_gamma:gamma2;
 gcv           = zeros(length(gamma_grid),1);
 count         = 1;
-
 %%
 
 for gamma = gamma_grid
@@ -33,6 +27,6 @@ gamma                     = gamma_grid(idx_gamma);
 Tjv                       = Tjv';
 Sjj                       = Tjv*Svv*Tjv';
 Sjj                       = (Sjj + Sjj')/2;
-[Thetajj,Sigmajj]         = hggm_solve(Sjj,m,aj,Ajj,Iq,rth,maxiter_inner);
+[Thetajj,Sigmajj]         = twostep_lasso_caller(Sjj,param);
 
 end
