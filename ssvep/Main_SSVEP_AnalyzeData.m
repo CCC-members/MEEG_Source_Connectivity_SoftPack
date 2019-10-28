@@ -127,7 +127,7 @@ for cond = 1:length(freq_list)
     end
     delete(process_waitbar);
     
-    [miu,sigma_post,DSTF]             = cross_nonovgrouped_enet_ssbl({Svv},{K},Ns,nonovgroups);
+    [miu,sigma_post]                  = cross_nonovgrouped_enet_ssbl({Svv},{K},Ns,nonovgroups);
     stat                              = sqrt(abs(miu))./abs(sigma_post);
     indms                             = find(stat > 0.5);
     J                                 = zeros(qfull,1);
@@ -168,49 +168,55 @@ for cond = 1:length(freq_list)
     %%
     %% Connectivity Leakage Module
     disp('connectivity leakage module...');
-     process_waitbar = waitbar(0,'Connectivity leakage module...');
+    process_waitbar = waitbar(0,'Connectivity leakage module...');
     % parameters
     param.maxiter_outer               = 60;
     param.maxiter_inner               = 30;
-    param.m                           = Ns;
-    param.rth                         = 3.55;
-    param.axi                         = 1E-1;
-    param.sigma2xi                    = 1E0;
-    param.Axixi                       = eye(size(Svv,1));
-    %%
     Kindms                            = cat(2,K_L(:,[indmsL{1};indmsL{2};indmsL{3}]),K_R(:,[indmsR{1};indmsR{2};indmsR{3}]));
-    q                                 = size(Kindms,2);
+    [p,q]                             = size(Kindms);    
+    param.p                           = p;
+    param.q                           = q;
+    param.Ip                          = eye(p);
+    param.Iq                          = eye(q);
+    param.m                           = Ns;
+    aj                                = sqrt(log(q)/Ns);
+    Ajj_diag                          = 0;
+    Ajj_ndiag                         = 1;
+    Ajj                               = Ajj_diag*eye(q)+Ajj_ndiag*(ones(q)-eye(q));
+    param.aj                          = aj;
+    param.Ajj                         = Ajj;
+    param.axi                         = 1E-1;
+    param.Axixi                       = eye(p);
+    param.Axixi_inv                   = eye(p);
+    param.ntry                        = 5;
+    param.prew                        = 0;
+    param.nu                          = Ns;
+    param.rth1                        = 0.7;
+    param.rth2                        = 3.16;
+    %%
     penalty                           = [1,2,0];
     Thetajj                           = zeros(q,q,length(penalty));
     Sjj                               = zeros(q,q,length(penalty));
     for k_penalty = 1:length(penalty)
          waitbar((k_penalty)/(length(penalty)),process_waitbar,strcat('Connectivity leakage module...'));
         param.penalty  = penalty(k_penalty);
-        [Thetajj(:,:,k_penalty),Sjj(:,:,k_penalty),llh{k_penalty},jj_on,xixi_on] = h_hggm(Svv,Kindms,param);
+        [Thetajj(:,:,k_penalty),Sjj(:,:,k_penalty),llh{k_penalty}] = higgs(Svv,Kindms,param);
     end
     delete(process_waitbar);
     
     %%
     figure_partial_correlation_maps1 = figure;
     set(gcf,'Position',[300 300 1400 300]);
-    X = Thetajj(:,:,1);
-    X = X - diag(diag(X));
-    X = X/max(abs(X(:)));
-    subplot(1,3,1); imagesc(abs(X)); axis off
-    assign_labels(labels_conn,ngen,5,3,2)
-    title('h-hggm-lasso partial correlations')
-    X = Thetajj(:,:,2);
-    X = X - diag(diag(X));
-    X = X/max(abs(X(:)));
-    subplot(1,3,2); imagesc(abs(X)); axis off
-    assign_labels(labels_conn,ngen,5,3,2)
-    title('h-hggm-ridge partial correlations')
-    X = Thetajj(:,:,3);
-    X = X - diag(diag(X));
-    X = X/max(abs(X(:)));
-    subplot(1,3,3); imagesc(abs(X)); axis off
-    assign_labels(labels_conn,ngen,5,3,2)
-    title('h-hggm-naive partial correlations')
+    methods_label = {'higgs-lasso';'higgs-ridge';'higgs-naive'}; % EEG
+    Thetajj_norm = zeros(size(Kindms,2),size(Kindms,2),length(methods_label));
+    for meth = 1:length(methods_label)
+        X                 = Thetajj(:,:,meth);
+        X                 = (X - diag(diag(X)))./sqrt((abs(diag(X))*abs(diag(X)')));
+        Thetajj_norm(:,:,meth) = X;
+        subplot(1,3,meth); imagesc(abs(X)); axis off;
+        assign_labels(labels_conn,ngen,5,3,2)
+        title(methods_label{meth});
+    end
     colormap('hot');
     
     saveas( figure_partial_correlation_maps1,strcat(output_sourse,filesep,'partial_correlation_maps_freq_',num2str(freq),'.fig'));
@@ -221,7 +227,7 @@ for cond = 1:length(freq_list)
     conn = zeros(length(labels_conn),length(labels_conn),3);
     for area1 = 1:length(labels_conn)
         for area2 = 1:length(labels_conn)
-            conn_tmp            = Thetajj(((area1-1)*ngen + 1):area1*ngen,((area2-1)*ngen + 1):area2*ngen,:);
+            conn_tmp            = Thetajj_norm(((area1-1)*ngen + 1):area1*ngen,((area2-1)*ngen + 1):area2*ngen,:);
             conn_tmp(:,:,1)     = conn_tmp(:,:,1) - diag(diag(conn_tmp(:,:,1)));
             conn_tmp(:,:,2)     = conn_tmp(:,:,2) - diag(diag(conn_tmp(:,:,2)));
             conn_tmp(:,:,3)     = conn_tmp(:,:,3) - diag(diag(conn_tmp(:,:,3)));
@@ -234,23 +240,20 @@ for cond = 1:length(freq_list)
     figure_partial_correlation_maps2 = figure;
     set(gcf,'Position',[300 300 1400 300]);
     X = conn(:,:,1);
-    X = X - diag(diag(X));
-    X = X/max(abs(X(:)));
+    X = (X - diag(diag(X)))./sqrt((abs(diag(X))*abs(diag(X)')));
     subplot(1,3,1); imagesc(abs(X)); axis off
     assign_labels(labels_conn,1,0.01,0.8,1)
-    title('h-hggm-lasso partial correlations')
+    title('higgs-lasso partial correlations')
     X = conn(:,:,2);
-    X = X - diag(diag(X));
-    X = X/max(abs(X(:)));
+    X = (X - diag(diag(X)))./sqrt((abs(diag(X))*abs(diag(X)')));
     subplot(1,3,2); imagesc(abs(X)); axis off
     assign_labels(labels_conn,1,0.01,0.8,1)
-    title('h-hggm-ridge partial correlations')
+    title('higgs-ridge partial correlations')
     X = conn(:,:,3);
-    X = X - diag(diag(X));
-    X = X/max(abs(X(:)));
+    X = (X - diag(diag(X)))./sqrt((abs(diag(X))*abs(diag(X)')));
     subplot(1,3,3); imagesc(abs(X)); axis off
     assign_labels(labels_conn,1,0.01,0.8,1)
-    title('h-hggm-naive partial correlations')
+    title('higgs-naive partial correlations')
     colormap('hot');
     
     saveas( figure_partial_correlation_maps2,strcat(output_sourse,filesep,'roi_partial_correlation_maps_freq_',num2str(freq),'.fig'));

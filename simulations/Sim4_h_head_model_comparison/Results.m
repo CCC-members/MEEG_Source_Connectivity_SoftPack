@@ -5,12 +5,12 @@ function [] = Results(output_sourse)
 load('colormap2.mat')
 load('Pseudorand_Net.mat')
 measures_label    = {'auc' 'sens' 'spec' 'prec' 'f1'};
-methods_label     = {'h-hggm-lasso';'h-hggm-ridge';'h-hggm-naive';'eloreta-hggm';'lcmv-h-hggm'};
+methods_label     = {'higgs-lasso';'higgs-ridge';'higgs-naive';'eloreta-hglasso';'lcmv-hglasso'};
 Nmeasures         = length(measures_label);
 %%
 %% h_hggm
-load('Solutions_h_hggm.mat')
-[measures]        = quality_measures(sol_h_hggm,Theta_sim);
+load('Solutions_higgs.mat')
+[measures]        = quality_measures(sol_higgs,Theta_sim);
 measures(isnan(measures)) = 0.5;
 measures_mean     = round(100*mean(measures,3));
 measures_std      = round(100*std(measures,0,3));
@@ -20,7 +20,7 @@ process_waitbar = waitbar(0,'Please wait...');
 for meth = 1:5
     for meas = 1:5
         waitbar((meth*meas)/(25),process_waitbar,strcat('Outputing results....'));
-        measures_h_hggm{meth,meas}  = [num2str(measures_mean(meth,meas)) '+/-' num2str(measures_std(meth,meas))];
+        measures_higgs{meth,meas}  = [num2str(measures_mean(meth,meas)) '+/-' num2str(measures_std(meth,meas))];
     end
 end
 delete(process_waitbar);
@@ -29,7 +29,7 @@ delete(process_waitbar);
 Table = cell(6,6);
 Table(2:end,1)    = methods_label;
 Table(1,2:end)    = measures_label;
-Table(2:end,2:end)  = measures_h_hggm;
+Table(2:end,2:end)  = measures_higgs;
 
 
 save(strcat(output_sourse,filesep,'Table_sens_system_',sens_system,'.mat'));
@@ -40,52 +40,52 @@ disp(strcat('Saving Table ---->  Table with quality measures to  ---> ', output_
 %% Plot likelihood
 
 
-Nsim = ceil(size(sol_h_hggm,2));
+Nsim = ceil(size(sol_higgs,2));
 figure_likelihood = figure; 
 
 subplot(3,2,1);
-llh = zeros(length(sol_h_hggm{4,1}{1}{1}),Nsim);
+llh = zeros(length(sol_higgs{4,1}{1}{1}),Nsim);
 
 for sim = 1:Nsim
   
-    llh(:,sim) = sol_h_hggm{4,sim}{1}{1};
+    llh(:,sim) = sol_higgs{4,sim}{1}{1};
 end
 
 plot(llh);
 ylabel('likelihood')
 xlabel('iterations')
-title('h-hggm-lasso likelihood')
+title('higgs-lasso likelihood')
 
 
 %%
 %%
 
 subplot(3,2,2); 
-llh = zeros(length(sol_h_hggm{4,1}{1}{2}),Nsim);
+llh = zeros(length(sol_higgs{4,1}{1}{2}),Nsim);
 for sim = 1:Nsim
    
-    llh(:,sim) = sol_h_hggm{4,sim}{1}{2};  
+    llh(:,sim) = sol_higgs{4,sim}{1}{2};  
 end
 
 plot(llh);
 ylabel('likelihood')
 xlabel('iterations')
-title('h-hggm-ridge likelihood')
+title('higgs-ridge likelihood')
 
 
 %%
 
 subplot(3,2,3); 
-llh = zeros(length(sol_h_hggm{4,1}{1}{3}),Nsim);
+llh = zeros(length(sol_higgs{4,1}{1}{3}),Nsim);
 for sim = 1:Nsim
     
-    llh(:,sim) = sol_h_hggm{4,sim}{1}{3};
+    llh(:,sim) = sol_higgs{4,sim}{1}{3};
 end
 
 plot(llh);
 ylabel('likelihood')
 xlabel('iterations')
-title('h-hggm-naive likelihood')
+title('higgs-naive likelihood')
 
 
 %%
@@ -93,16 +93,16 @@ title('h-hggm-naive likelihood')
 
 subplot(3,2,4); 
 for sim = 1:Nsim
-    [gcv_opt,idx_gamma]       = min(sol_h_hggm{4,sim}{3});
-    plot(sol_h_hggm{4,1}{2},sol_h_hggm{4,sim}{3},...
-        '-',sol_h_hggm{4,1}{2}(idx_gamma),...
+    [gcv_opt,idx_gamma]       = min(sol_higgs{4,sim}{3});
+    plot(sol_higgs{4,1}{2},sol_higgs{4,sim}{3},...
+        '-',sol_higgs{4,1}{2}(idx_gamma),...
         gcv_opt,'b*');
     hold on;
 end
 
 ylabel('gcv value')
 xlabel('regularization parameter')
-title('eloreta-hggm gcv function')
+title('eloreta-hglasso gcv function')
 
 %% Plot corticaL map 
 cortex.vertices = vertices;
@@ -153,49 +153,66 @@ else
     title('pseudo-head model','color','k')
 end
 
-saveas( figure_likelihood,strcat(output_sourse,filesep,'h-hggm likelihood_sens_system_',sens_system,'.fig'));
-disp(strcat('Saving figure ---->  h-hggm likelihood to  ---> ', output_sourse) );
+saveas( figure_likelihood,strcat(output_sourse,filesep,'higgs likelihood_sens_system_',sens_system,'.fig'));
+disp(strcat('Saving figure ---->  higgs likelihood to  ---> ', output_sourse) );
 delete(figure_likelihood);
 
 
 %%
-figure_partial_correlations = figure;
+figure_partial_coherences = figure;
+load('colormap3')
 %% Plot partial correlations
 X  = Theta_sim{1};
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,2,1); imagesc(abs(X));
+subplot(2,3,1); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
-title('simulated partial correlations')
+title('simulated PCoh')
 %%
-X  = sol_h_hggm{3,1}(:,:,1);
+X  = sol_higgs{3,1}(:,:,1);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,2,2); imagesc(abs(X)); 
+subplot(2,3,2); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
-title('h-hggm-lasso partial correlations')
+title('higgs-lasso PCoh')
 %%
-X  = sol_h_hggm{3,1}(:,:,2);
+X  = sol_higgs{3,1}(:,:,2);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,2,3); imagesc(abs(X)); 
+subplot(2,3,3); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
-title('h-hggm-ridge partial correlations')
+title('higgs-ridge PCoh')
 %%
-X  = sol_h_hggm{3,1}(:,:,3);
+X  = sol_higgs{3,1}(:,:,3);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,2,4); imagesc(abs(X)); 
+subplot(2,3,4); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
-title('h-hggm-naive partial correlations')
+title('higgs-naive PCoh')
 %%
-colormap('hot');
+X  = sol_higgs{3,1}(:,:,4);
+X  = X - diag(diag(X));
+X  = X/max(abs(X(:)));
+subplot(2,3,5); imagesc(abs(X)); 
+ylabel('generators')
+xlabel('generators')
+title('eloreta-hglasso PCoh')
+%%
+X  = sol_higgs{3,1}(:,:,5);
+X  = X - diag(diag(X));
+X  = X/max(abs(X(:)));
+subplot(2,3,6); imagesc(abs(X)); 
+ylabel('generators')
+xlabel('generators')
+title('lcmv-hglasso PCoh')
+%%
+colormap(cmap);
 
-saveas( figure_partial_correlations,strcat(output_sourse,filesep,'partial_correlation_maps_sens_system_',sens_system,'.fig'));
-disp(strcat('Saving figure ---->  Partial Correlation Maps to  ---> ', output_sourse) );
-delete(figure_partial_correlations);
+saveas( figure_partial_coherences,strcat(output_sourse,filesep,'partial_coherence_maps_sens_system_',sens_system,'.fig'));
+disp(strcat('Saving figure ---->  Partial Coherence Maps to  ---> ', output_sourse) );
+delete(figure_partial_coherences);
 end

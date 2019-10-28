@@ -31,7 +31,7 @@ for i = 1:2
     else
         sens_system = 'large';
     end
-    waitbar(1/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
+    waitbar(1/4,process_waitbar,strcat('higgs & two-step solution - SS:',sens_system ));
     %%
     if strcmp(sens_system,'large') == 1
         load('HeadModel_large.mat'); % Load mesh vertices (all Lead Fields should be given on homemorph surfaces)
@@ -42,7 +42,7 @@ for i = 1:2
     vertices   = cortex.vertices;
     faces      = cortex.faces;
     %%
-    waitbar(2/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
+    waitbar(2/4,process_waitbar,strcat('higgs & two-step solution - SS:',sens_system ));
     %%  Definition of Cortical points
     if strcmp(sens_system,'large') == 1
         load('data_tips24_large.mat')
@@ -60,7 +60,7 @@ for i = 1:2
         Seeders(cont) = pickpoint(vx,vy,vz,vertices,1E-3);
     end
     Seeders      = Seeders(randperm(Nseed));
-    waitbar(3/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
+    waitbar(3/4,process_waitbar,strcat('higgs & two-step solution - SS:',sens_system ));
     %%
     if strcmp(sens_system,'large') == 1
         load ('LeadFields_large.mat'); % Load Lead Field cell array (1 X number of Lead Fields)
@@ -113,37 +113,53 @@ for i = 1:2
     %% Likelihood test
     param.maxiter_outer = 60;
     param.maxiter_inner = 30;
+    p                   = length(Svv);
+    q                   = length(Seeders);
+    param.p             = p;
+    param.q             = q;
+    param.Ip            = eye(p);
+    param.Iq            = eye(q);
     param.m             = m;
-    param.rth           = 3.16;
-    param.axi           = 1E-5;
-    param.sigma2xi      = 1E0;
-    param.Axixi         = eye(length(Svv));
+    aj                  = sqrt(log(q)/m);
+    Ajj_diag            = 0;
+    Ajj_ndiag           = 1;
+    Ajj                 = Ajj_diag*eye(q)+Ajj_ndiag*(ones(q)-eye(q));
+    param.aj            = aj;
+    param.Ajj           = Ajj;
+    param.axi           = 1E-4;
+    param.Axixi         = eye(p);
+    param.Axixi_inv     = eye(p);
+    param.ntry          = 0;
+    param.prew          = 0;
+    param.nu            = m;
+    param.rth1          = 0.7;
+    param.rth2          = 3.16;
     %%
     penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
     Thetajj_est         = zeros(q,q,length(penalty) + 2);
     llh_outer           = cell(1,length(penalty));
     llh_inner           = cell(1,length(penalty));
-    waitbar(4/4,process_waitbar,strcat('h-hggm & eloreta-hggm solution - SS:',sens_system ));
+    waitbar(4/4,process_waitbar,strcat('higgs & two-step solution - SS:',sens_system ));
     for cont = 1:length(penalty)
         
         param.penalty  = penalty(cont);
-        [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont},xixi_on,jj_on] = h_hggm(Svv,Lvj(:,Seeders),param);
+        [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont}] = higgs(Svv,Lvj(:,Seeders),param);
     end
     
     %% eloreta + hggm
     param.gamma1        = 0.001;
     param.gamma2        = 0.05;
     param.delta_gamma   = 0.001;
-    [Thetajj_est(:,:,4),Sjj_est,gamma_grid,gamma,gcv] = eloreta_hggm(Svv,Lvj(:,Seeders),param);
+    [Thetajj_est(:,:,4),Sjj_est,gamma_grid,gamma,gcv] = eloreta_hg_lasso(Svv,Lvj(:,Seeders),param);
     
     %% lcmv + hggm
     param.gamma         = sum(abs(diag(Svv)))/(length(Svv)*100);
-    [Thetajj_est(:,:,5),Sjj_est] = lcmv_hggm(Svv,Lvj(:,Seeders),param);
+    [Thetajj_est(:,:,5),Sjj_est] = lcmv_hg_lasso(Svv,Lvj(:,Seeders),param);
     delete(process_waitbar);
-        
-    %% Plot Results
-    figure_partial_correlations_maps = figure('Position',[182,114,832,521]);
     
+    %% Plot Results
+    figure_partial_coherence_maps = figure('Position',[182,114,832,521]);
+    load('colormap3')
     %%
     X = Thetajj_sim;
     X = X - diag(diag(X));
@@ -151,7 +167,7 @@ for i = 1:2
     subplot(2,3,1); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
-    title('simulated partial correlations')
+    title('simulated PCoh')
     %%
     X = Thetajj_est(:,:,1);
     X = X - diag(diag(X));
@@ -159,7 +175,7 @@ for i = 1:2
     subplot(2,3,2); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
-    title('h-hggm-lasso partial correlations')
+    title('higss-lasso PCoh')
     %%
     X = Thetajj_est(:,:,2);
     X = X - diag(diag(X));
@@ -167,7 +183,7 @@ for i = 1:2
     subplot(2,3,3); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
-    title('h-hggm-ridge partial correlations')
+    title('higgs-ridge PCoh')
     %%
     X = Thetajj_est(:,:,3);
     X = X - diag(diag(X));
@@ -175,9 +191,7 @@ for i = 1:2
     subplot(2,3,4); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
-    title('h-hggm-naive partial correlations')
-    colormap('hot');
-    
+    title('higgs-naive PCoh')    
     %%
     X = Thetajj_est(:,:,4);
     X = X - diag(diag(X));
@@ -185,9 +199,7 @@ for i = 1:2
     subplot(2,3,5); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
-    title('eloreta-hggm partial correlations')
-    colormap('hot');
-    
+    title('eloreta-hglasso PCoh')    
     %%
     X = Thetajj_est(:,:,5);
     X = X - diag(diag(X));
@@ -195,13 +207,13 @@ for i = 1:2
     subplot(2,3,6); imagesc(abs(X));
     ylabel('generators')
     xlabel('generators')
-    title('lcmv-hggm partial correlations')
-    colormap('hot');
+    title('lcmv-hglasso PCoh')
+    colormap(cmap);
     %%
     
-    saveas( figure_partial_correlations_maps,strcat(output_sourse,filesep,'partial_correlation_maps_(',sens_system,')_.fig'));
-    disp(strcat('Saving figure ---->  Partial Correlation Maps to  ---> ', output_sourse) );
-    delete(figure_partial_correlations_maps);
+    saveas( figure_partial_coherence_maps,strcat(output_sourse,filesep,'partial_coherence_maps_(',sens_system,')_.fig'));
+    disp(strcat('Saving figure ---->  Partial Coherence Maps to  ---> ', output_sourse) );
+    delete(figure_partial_coherence_maps);
     
 end
 

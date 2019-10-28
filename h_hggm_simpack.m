@@ -272,7 +272,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         return;
                     end
                 end
-                Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
+                Main_HIGGS_Head_Model_Comparison(app.output_sourse);
                 msgbox('Completed operation','Info');
             end
         end

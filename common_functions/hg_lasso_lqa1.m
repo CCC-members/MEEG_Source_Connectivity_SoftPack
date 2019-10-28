@@ -19,7 +19,7 @@ for k_inner = 1:maxiter
     %% Estimation of variances Gamma of Gaussian Mixtures prior
     DET              = 1 + 4*m2*a2*A2(idx).*abs(Theta(idx)).^2;
     gamma2(idx)      = (sqrt(DET) - 1)./(2*m*a2*A2(idx));
-    gamma2(idx0)      = m*abs(Theta(idx0)).^2;
+    gamma2(idx0)     = m*abs(Theta(idx0)).^2;
     %%
     %% Standarization of the Empirical Covariance Matrix
     ninf             = max(gamma2(:));

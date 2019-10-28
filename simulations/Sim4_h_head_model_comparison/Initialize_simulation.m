@@ -32,7 +32,7 @@ elec_pos   = coor;
 Nv         = size(vertices,1);    % Number of vertices
 Nsubj      = size(LeadFields,2);  % Number of Subjects
 if strcmp(sens_system,'pseudo') == 1 || strcmp(sens_system,'small') == 1
-    Nsamp      = 600; % sample number
+    Nsamp      = 1200; % sample number
     d0         = 9E0; % patches geodesic radious
 elseif strcmp(sens_system,'large') == 1
     Nsamp      = 6000; % sample number
@@ -58,7 +58,7 @@ elseif strcmp(sens_system,'pseudo') == 1
     load('data_tips22_pseudo.mat')
 end
 %%
-Nsim         = 100;
+Nsim         = 3;
 Nseed        = size(data_tips,2);
 if strcmp(sens_system,'large') == 1 || strcmp(sens_system,'small') == 1
     Seeders      = zeros(1,Nseed);
