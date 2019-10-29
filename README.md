@@ -38,7 +38,7 @@ Authors:
    - Ariosky Areces Gonzalez
    - Pedro A. Valdes Sosa
 
-Date: July 11, 2019
+Date: October 29, 2019
 
 ##
 
