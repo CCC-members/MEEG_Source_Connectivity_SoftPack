@@ -6,22 +6,23 @@ load('colormap2.mat')
 % load('Pseudorand_Net.mat')
 load([output_source,filesep,'Pseudorand_Net.mat'])
 measures_label    = {'auc' 'sens' 'spec' 'prec' 'f1'};
-methods_label     = {'higgs-lasso';'higgs-ridge';'higgs-naive';'eloreta-hglasso';'lcmv-hglasso'};
+methods_label     = {'higgs-lasso';'higgs-ridge';'higgs-naive';'eloreta-hglasso';'lcmv-hglasso';'eloreta-roinets';'lcmv-roinets'};
 Nmeasures         = length(measures_label);
+Nmethods          = length(methods_label);
 %%
 %% h_hggm
 % load('Solutions_higgs.mat')
 load([output_source,filesep,'Solutions_higgs.mat'])
-alphaPeakSliceNum=round(options.nu0(2)/options.deltaf)+1;
-[measures]        = quality_measures(sol_higgs,theta_sim,alphaPeakSliceNum);
+% alphaPeakSliceNum=round(options.nu0(2)/options.deltaf)+1;
+[measures]        = quality_measures(sol_higgs,theta0_sim);
 measures(isnan(measures)) = 0.5;
 measures_mean     = round(100*mean(measures,3));
 measures_std      = round(100*std(measures,0,3));
 %%
 %%
 process_waitbar = waitbar(0,'Please wait...');
-for meth = 1:5
-    for meas = 1:5
+for meth = 1:Nmethods
+    for meas = 1:Nmeasures
         waitbar((meth*meas)/(25),process_waitbar,strcat('Outputing results....'));
         measures_higgs{meth,meas}  = [num2str(measures_mean(meth,meas)) '+/-' num2str(measures_std(meth,meas))];
     end
@@ -29,7 +30,7 @@ end
 delete(process_waitbar);
 %%
 %% Table with quality measures
-Table = cell(6,6);
+Table = cell(Nmethods+1,Nmeasures+1);
 Table(2:end,1)    = methods_label;
 Table(1,2:end)    = measures_label;
 Table(2:end,2:end)  = measures_higgs;
@@ -150,7 +151,7 @@ else
     subplot(3,2,5); 
     patch('Faces',faces,'Vertices',vertices,'FaceVertexCData',J,'FaceColor','interp','Marker','o','MarkerFaceColor','y','EdgeColor',[0.313725501298904 0.313725501298904 0.313725501298904],'FaceAlpha',.95);
     hold on 
-    scatter(elec_pos(:,1),elec_pos(:,2),'Marker','.','MarkerFaceColor','k','MarkerEdgeColor','k')
+    scatter(elec_pos_trans(:,1),elec_pos_trans(:,2),'Marker','.','MarkerFaceColor','k','MarkerEdgeColor','k')
     axis off;
     colormap(cmap);
 %     set(gcf,'Color','k');
@@ -168,10 +169,10 @@ delete(figure_likelihood);
 figure_partial_coherences = figure;
 load('colormap3')
 %% Plot partial correlations
-X  = theta_sim{1}(:,:,alphaPeakSliceNum);
+X  = theta0_sim{1};
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,3,1); imagesc(abs(X));
+subplot(2,4,1); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
 title('simulated PCoh')
@@ -179,7 +180,7 @@ title('simulated PCoh')
 X  = sol_higgs{3,1}(:,:,1);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,3,2); imagesc(abs(X)); 
+subplot(2,4,2); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('higgs-lasso PCoh')
@@ -187,7 +188,7 @@ title('higgs-lasso PCoh')
 X  = sol_higgs{3,1}(:,:,2);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,3,3); imagesc(abs(X)); 
+subplot(2,4,3); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('higgs-ridge PCoh')
@@ -195,7 +196,7 @@ title('higgs-ridge PCoh')
 X  = sol_higgs{3,1}(:,:,3);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,3,4); imagesc(abs(X)); 
+subplot(2,4,4); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('higgs-naive PCoh')
@@ -203,7 +204,7 @@ title('higgs-naive PCoh')
 X  = sol_higgs{3,1}(:,:,4);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,3,5); imagesc(abs(X)); 
+subplot(2,4,5); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('eloreta-hglasso PCoh')
@@ -211,10 +212,28 @@ title('eloreta-hglasso PCoh')
 X  = sol_higgs{3,1}(:,:,5);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,3,6); imagesc(abs(X)); 
+subplot(2,4,6); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('lcmv-hglasso PCoh')
+%%
+X  = sol_higgs{3,1}(:,:,6);
+X  = X - diag(diag(X));
+X  = X/max(abs(X(:)));
+subplot(2,4,7); imagesc(abs(X)); 
+ylabel('generators')
+xlabel('generators')
+title('eloreta-roi-nets PCoh')
+%%
+X  = sol_higgs{3,1}(:,:,7);
+X  = X - diag(diag(X));
+X  = X/max(abs(X(:)));
+subplot(2,4,8); imagesc(abs(X)); 
+ylabel('generators')
+xlabel('generators')
+title('lcmv-roi-nets PCoh')
+
+
 %%
 colormap(cmap);
 

@@ -13,6 +13,7 @@ V_sim                           = cell(1,Nsim);
 Jseed_sim                       = cell(1,Nsim);
 sigma_sim                       = cell(1,Nsim);
 theta_sim                       = cell(1,Nsim);
+theta0_sim                      = cell(1,Nsim);
 Jwhole_sim                      = cell(1,Nsim);
 for sim=1:Nsim
     Svv0_sim{:,sim}             = cell(1,Nsubj); % Sensor covariances without noise
@@ -24,6 +25,7 @@ for sim=1:Nsim
     Jvar_sim{:,sim}              = zeros(Nsource,1);    % Sources Variances
     Jseed_sim{:,sim}             = zeros(Nseed,Ntpoints,Nsegments);       % Activate source signal
     theta_sim{:,sim}             = zeros(Nseed,Nseed,Nfreqs);     % Precision matrix
+    theta0_sim{:,sim}             = zeros(Nseed,Nseed);     % Precision matrix0
     sigma_sim{:,sim}             = zeros(Nseed,Nseed,Nfreqs);  % Covariance matrix
     if FLAG_SAVESOURCE==1
         Jwhole_sim{:,sim} = ndSparse.build([Nsource,Ntpoints,Nsegments]);    % Whole brain source signal without noise
@@ -51,7 +53,7 @@ for sim = 1:Nsim
     options.SeedsIdx=SeedsIdx;
     options.SeedsPos=SeedsPos;
     %% Simulating Alpha signal
-    [sigma,theta,process,process_eneger] = gen_processes(Nsegments,Nseed,options);
+    [theta0,sigma,theta,process,process_eneger] = gen_processes(Nsegments,Nseed,options);
     %% Simulating Biological Noise
     [rs0,noise_eneger] = gen_process_xi(Nnoise,Ntpoints,Nsegments,Nsubj,index_full,options);
     %%
@@ -67,11 +69,10 @@ for sim = 1:Nsim
         for subj = 1:Nsubj
             K                   = LeadFields{subj};
             rs_tmp              = K(:,index_full)*squeeze(rs0(:,:,segment,subj));
-            %                         noisesources{subj}  = db_source*sum(abs(V0{subj}(:)).^2)^(1/2)*rs_tmp/sum(abs(rs_tmp(:)).^2)^(1/2);
-%             SourceNoiseRatio1=db_source*sum(abs(V0{subj}(:)).^2)^(1/2)/sum(abs(rs_tmp(:)).^2)^(1/2);
-            SourceNoiseRatio=db_source* sum(abs(K(:,SeedsIdx(:,sim))*process_eneger).^2,[1,2])^(1/2) / sum(abs(K(:,index_full)*noise_eneger).^2,[1,2])^(1/2);
-
-%             SourceNoiseRatio1/SourceNoiseRatio;
+%           noisesources{subj}  = db_source*sum(abs(V0{subj}(:)).^2)^(1/2)*rs_tmp/sum(abs(rs_tmp(:)).^2)^(1/2);
+%           SourceNoiseRatio=db_source*sum(abs(V0{subj}(:)).^2)^(1/2)/sum(abs(rs_tmp(:)).^2)^(1/2);
+%           SourceNoiseRatio=db_source* sum(abs(K(:,SeedsIdx(:,sim))*process_eneger).^2,[1,2])^(1/2) / sum(abs(K(:,index_full)*noise_eneger).^2,[1,2])^(1/2);
+            SourceNoiseRatio=db_source* sum(sum(abs(K(:,SeedsIdx(:,sim))*process_eneger).^2))^(1/2) / sum(sum(abs(K(:,index_full)*noise_eneger).^2))^(1/2);
             noisesources{subj}  = SourceNoiseRatio*rs_tmp;
         end
         %% Simulating Sensors Noise
@@ -125,6 +126,7 @@ for sim = 1:Nsim
         Jvar_sim{:,sim}                   = gather(Jvar);    % Sources Variances
         Jseed_sim{:,sim}                  = gather(process);              % Seeds signal
         theta_sim{:,sim}                  = gather(theta);          % Precision matrix
+        theta0_sim{:,sim}                 = gather(theta0);
         sigma_sim{:,sim}                  = gather(sigma);
         if FLAG_SAVESOURCE==1
             Jwhole_sim{:,sim}(SeedsIdx(:,sim),:,:)             = gather(process);            % Source signal without noise
@@ -135,6 +137,7 @@ for sim = 1:Nsim
         Jvar_sim{:,sim}                   = Jvar;    % Sources Variances
         Jseed_sim{:,sim}                  = process;              % Seeds signal
         theta_sim{:,sim}                  = theta;          % Precision matrix
+        theta0_sim{:,sim}                 = theta0;
         sigma_sim{:,sim}                  = sigma;
         if FLAG_SAVESOURCE==1
             Jwhole_sim{:,sim}(SeedsIdx(:,sim),:,:)        = process;            % Source signal without noise
@@ -146,5 +149,5 @@ end %for sim
 % % delete(process_waitbar1);
 
 save([output_source,filesep,'Pseudorand_Net.mat'],'Jvar_sim', 'index_full', 'Svv0_sim', 'Svv_sim' ,'LeadFields', ...
-    'sens_system', 'options','V0_sim','V_sim','K','Jwhole_sim','sigma_sim','theta_sim','Jseed_sim','options','-v7.3')
+    'sens_system', 'options','V0_sim','V_sim','K','Jwhole_sim','sigma_sim','theta_sim','theta0_sim','Jseed_sim','options','-v7.3')
 end

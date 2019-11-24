@@ -1,4 +1,4 @@
-function mats = run_correlation_analysis(nodeData, envData, Regularize)
+function mats = run_correlation_analysis2(nodeData, envData, Regularize)
 %RUN_CORRELATION_ANALYSIS runs various correlations on node data
 % MATS = RUN_CORRELATION_ANALYSIS(NODEDATA, ENVDATA)
 %   produces matrices in structure MATS which give the correlation of the 
@@ -85,6 +85,7 @@ if ~isempty(nodeData),
     for iTrial = size(nodeData,3):-1:1,
         rawCorr(:,:,iTrial) = corr(nodeData(:,:,iTrial)');
     end
+    rawCorr=mean(rawCorr,3);
     clear nodeData
 else
     rawCorr = [];
@@ -97,6 +98,10 @@ for iTrial = nTrials:-1:1,
     nodePrecision(:,:,iTrial) = ROInets.cholinv(nodeCov(:,:,iTrial));
     nodePCorr(:,:,iTrial)     = ROInets.convert_precision_to_pcorr(nodePrecision(:,:,iTrial));
 end%for
+nodeCov=mean(nodeCov,3);
+nodeCorr=mean(nodeCorr,3);
+nodePrecision=mean(nodePrecision,3);
+nodePCorr=mean(nodePCorr,3);
 
 nSamples = ROInets.cols(envData);
 
@@ -148,17 +153,17 @@ if Regularize.do,
         % do Friedman (2008)'s graphical lasso. May be faster. 
         fprintf('   Regularizing using graphical lasso and x-validation \n');
         Kfold                  = 10;
-        for iTrial = nTrials:-1:1,
-            [regPrecision(:,:,iTrial), rhoOpt(:,:,iTrial)] =                  ...
-                             ROInets.glasso_cv(real(normalise_vectors(        ...
-                                               ROInets.demean(envData(:,:,iTrial),2),2)), ...
+%         for iTrial = nTrials:-1:1,
+            [regPrecision, rhoOpt] =                  ...
+                             ROInets.glasso_cv2(real(normalise_vectors(        ...
+                                               ROInets.demean(envData,2),2)), ...
                                                        Regularize.path,       ...
                                                        Kfold,                 ...
                                                        'LogLikelihood',                    ...
                                                        Regularize.adaptivePath);
 
-            regPCorr(:,:,iTrial) = ROInets.convert_precision_to_pcorr(regPrecision(:,:,iTrial));
-        end%for
+            regPCorr = ROInets.convert_precision_to_pcorr(regPrecision);
+%         end%for
         mats.envPrecisionRegularized          = regPrecision;% this is going to be scaled. Sorry.
         mats.envPartialCorrelationRegularized = regPCorr;
         mats.Regularization.mean              = mean(rhoOpt,3);

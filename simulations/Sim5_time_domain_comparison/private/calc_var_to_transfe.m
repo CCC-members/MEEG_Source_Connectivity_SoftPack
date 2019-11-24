@@ -1,5 +1,9 @@
 function H=calc_var_to_transfe(A,w,approxi)
-% S=fun_var_to_cpsd_w(A,resSigma,w,approxi)
+% Authors:
+% - Ying Wang
+
+% Date: Nov 24, 2019
+
 [n,~,p]=size(A);
 fprintf('<calc_var_to_transfe.m> Calculating transfer function from coefficient of variable(%d) order(%d) vector autoregressive model; \n',...
     n,p);

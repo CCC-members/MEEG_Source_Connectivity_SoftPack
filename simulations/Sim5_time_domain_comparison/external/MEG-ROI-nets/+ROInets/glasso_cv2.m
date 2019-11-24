@@ -1,4 +1,4 @@
-function [P, rhoBest, W] = glasso_cv(Y, rhoPath, K, criterion, adaptiveGrid)
+function [P, rhoBest, W] = glasso_cv2(Y, rhoPath, K, criterion, adaptiveGrid)
 %GLASSO_CV K-fold cross-validation for shrinkage parameter in glasso
 %
 % [P, RHOBEST] = glasso_cv(Y, rhoPath, K) performs K-fold
@@ -84,7 +84,8 @@ assert(all(diff(rhoPath) > 0), ...
 
 % check for only one rho value
 if 1 == length(rhoPath), 
-    S = Y * Y' ./ ROInets.cols(Y); % inline cov
+%     S = Y * Y' ./ ROInets.cols(Y); % inline cov
+    S=ROInets.calc_covariance(Y);
 %     P = ROInets.glasso_frequentist(S, rhoPath(1));
     [P, W] = ROInets.dp_glasso(S, [], rhoPath);
     rhoBest = rhoPath;
@@ -334,7 +335,7 @@ end%finesse_path
 
 % Main worker function ----------------------------------------------------
 function [Pbest, rhoBest, Wbest] = main_glasso_cv(Y, rhoPath, K, scoreFun)
-[nNodes, nSamples] = size(Y);
+[nNodes, nSamples,~] = size(Y);
 
 assert(nSamples >= nNodes,                 ...
        [mfilename ':PoorlyFormattedData'], ...
@@ -355,13 +356,15 @@ verbose = 0;
 for iFold = 1:K
     % create fold
 %     ft_progress(iFold/K, '      glasso_cv: fold %d out of %d', iFold, K);
-    Y_test  = Y(:, ((iFold-1) * k + 1) : (iFold * k));
+    Y_test  = Y(:, ((iFold-1) * k + 1) : (iFold * k),:);
     Y_train = Y;
-    Y_train(:, ((iFold-1) * k + 1) : (iFold * k)) = [];
+    Y_train(:, ((iFold-1) * k + 1) : (iFold * k),:) = [];
     
-    S_train = Y_train * Y_train' / ROInets.cols(Y_train); % inline cov. Normalise by N not N-1.
-    S_test  = Y_test  * Y_test'  / ROInets.cols(Y_test);
-    
+%     S_train = Y_train * Y_train' / ROInets.cols(Y_train); % inline cov. Normalise by N not N-1.
+%     S_test  = Y_test  * Y_test'  / ROInets.cols(Y_test);
+    S_train=ROInets.calc_covariance(Y_train);
+    S_test=ROInets.calc_covariance(Y_test);
+
     P = ROInets.dp_glasso(S_train, [], rhoPath, [], [], verbose);
     for jRho = 1:length(rhoPath)
 %         P = ROInets.glasso_frequentist(S_train, rhoPath(jRho), verbose); 
@@ -376,7 +379,8 @@ end%for
 % compute output based on best rho, using the whitest of the saved P 
 % matrices as a warm start
 rhoBest        = rhoPath(rhoBestInd);
-S              = Y * Y' / nSamples; % inline cov
+% S              = Y * Y' / nSamples; % inline cov
+S=ROInets.calc_covariance(Y);
 [Pbest, Wbest] = ROInets.dp_glasso(S, P(:,:,end), rhoBest);
 % Pbest   = ROInets.glasso_frequentist(S, rhoBest);
 end%main_glasso_cv

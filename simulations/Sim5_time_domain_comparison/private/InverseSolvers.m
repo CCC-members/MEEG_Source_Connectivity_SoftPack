@@ -20,7 +20,6 @@ LeadFields = LeadFields(1,subject);
 % 'Vsim' is a cell array containing Simulated or Real Data at different conditions,
 % every cell contains a tensor of (Number of Sensors, Time points or Frequencies, Subjects X Samples)
 %% Run h-hggm
-% sol_higgs = InverseSolver_higgs_backup(Svv_sim,LeadFields,options.SeedsIdx,options.Nsegments,sens_system);
 sol_higgs = InverseSolver_higgs(V_sim,LeadFields,options.SeedsIdx,options.Nsegments,sens_system,options.Fs);
 
 % save(strcat('simulations',filesep,'Sim5_time_domain_comparison',filesep,'Solutions_higgs'),'sol_higgs', '-v7.3')

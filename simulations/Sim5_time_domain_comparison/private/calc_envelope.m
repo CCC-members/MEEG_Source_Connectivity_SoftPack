@@ -1,4 +1,7 @@
-function [y, t_ds, newFs]=calc_envelope(y,Fs)
+function [y, t_ds, newFs]=calc_envelope(y,Fs,F_deman)
+if nargin<3
+    F_deman=true;
+end
 if nargin<2
     Fs=200;
 end
@@ -14,23 +17,24 @@ timeRange=[];iSession=[];
 Settings.EnvelopeParams.takeLogs    = false;                           % perform analysis on logarithm of envelope. This improves normality assumption
 Settings.EnvelopeParams.absolute    = false;
 Settings.EnvelopeParams.downsample  = false;
-Settings.EnvelopeParams.windowLength = 1/20; % 1/20 s                       % sliding window length for power envelope calculation. See Brookes 2011, 2012 and Luckhoo 2012.
-Settings.EnvelopeParams.useFilter    = true;                        % use a more sophisticated filter than a sliding window average
 Settings.EnvelopeParams.saveMemory  = false;
+% set downsample to false then this two doesn't metter
+    Settings.EnvelopeParams.windowLength = 1/20; % 1/20 s                       % sliding window length for power envelope calculation. See Brookes 2011, 2012 and Luckhoo 2012.
+    Settings.EnvelopeParams.useFilter    = true;                        % use a more sophisticated filter than a sliding window average
 
-% [y_temp, ~, ~]= ROInets.envelope_data(squeeze(y(:,:,1)),t,Settings.EnvelopeParams);
-% y_env=zeros(m,size(y_temp,2),s);
 
-% for i=1:s
-%     [y_env(:,:,i), t_ds, newFs]= ROInets.envelope_data(squeeze(y(:,:,i)),t,Settings.EnvelopeParams);
-% end
 y=permute(y,[1,3,2]);
 y=reshape(y,[m*s,n]);
-% y= osl_filter(y,band,'fs',Fs);
 if test_gpu([],m*s*n*4)
     [y, t_ds, newFs]= ROInets.envelope_data(gpuArray(y),t,Settings.EnvelopeParams);
+    if F_deman
+        y=ROInets.demean(y,2);
+    end
 else
-    [y, t_ds, newFs]= ROInets.envelope_data(y,t,Settings.EnvelopeParams);
+    [y, t_ds, newFs]= ROInets.demean(ROInets.envelope_data(y,t,Settings.EnvelopeParams),2);
+    if F_deman
+         y=ROInets.demean(y,2);
+    end
 end
 n1=size(y,2);
 y=reshape(y,[m,s,n1]);

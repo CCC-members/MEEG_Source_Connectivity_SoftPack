@@ -18,22 +18,35 @@ function correlationMats = synthetic(outDir)
 	time     = 0:1.0/Fs:duration;
 	nSamples = length(time);
 	b        = fir1(1024, 0.5);
-	nVoxels  = 3;
+% 	nVoxels  = 3;
+    nVoxels=3;
 	[ARfilterTerms, ARnoiseVar] = lpc(b, 7); 
 	% Generate data from a covariance matrix and smooth
-	C    = [1  -0.1 0.6
-	       -0.1   1 0.3
-	        0.6 0.3   1] * ARnoiseVar;
+% 	C    = [1  -0.1 0.6
+% 	       -0.1   1 0.3
+% 	        0.6 0.3   1] * ARnoiseVar;
+
+    options.config       = 2;
+    options.var          = 2;
+    options.connections  = [1 2; 2 1];
+    options.extensions   = [ceil(nVoxels/3); ceil(nVoxels/3); nVoxels - 2*ceil(nVoxels/3)];
+    [C,Theta] = gen_sggm02(nVoxels,options);
+    C=C*ARnoiseVar;
+    
 	u    = chol(C)' * randn(nVoxels, nSamples);
+    imagesc(corr(u'));
 	data = filter(1, ARfilterTerms, u.').';
+    figure;
+    imagesc(corr(data'));
+%     data=repmat(data,[1,1,3]);
 	figure('Name', 'Input data', 'Color', 'w');
-	plot(time.', data.');
+	plot(time.', data.');%(:,:,1)
 	% Save to file
 	sampleRateInHz = Fs;
 	save(dataFile, 'data', 'time', 'sampleRateInHz');
 	
 	% Choose a binary ROI map. 
-	spatialBasis = eye(3);
+	spatialBasis = eye(nVoxels);
                  
 	% set a save file name
 	resultsName = fullfile(outDir, 'syntheticResults');
@@ -81,3 +94,4 @@ function correlationMats = synthetic(outDir)
 	              'myBestSubject_13-30Hz_ROI_envelope_timecourses.mat'));
 	figure('Name', 'envelope timecourses', 'Color', 'w');
 	plot(time_ds', nodeEnv')
+end

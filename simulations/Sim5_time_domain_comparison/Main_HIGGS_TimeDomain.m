@@ -1,6 +1,8 @@
 function result = Main_HIGGS_TimeDomain(output_source)
 %%
 % Authors:
+
+% - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
 % - Eduardo Gonzalez Moreira
 % - Pedro A. Valdes Sosa
@@ -8,16 +10,16 @@ function result = Main_HIGGS_TimeDomain(output_source)
 % Date: April 4, 2019
 
 % Updates
-% - Ariosky Areces Gonzalez
+% - Ying Wang
 
-% Date: April 4, 2019
+% Date: Nov 24, 2019
 
-rng('default')
+% rng('default')
 
 % addpath([fileparts(mfilename('fullpath')),filesep,'function'])
 addpath(genpath([fileparts(mfilename('fullpath')),filesep,'external']))
 if nargin<1 || isempty(output_source)
-    output_source='.\result';
+    output_source='./result';
 end
 output_source = strcat(output_source, filesep,'HIGGS_TimeDomain');
 if(~exist(output_source))
@@ -26,7 +28,7 @@ end
 
 %% Input Lead Field model
 
-for i = 2:2
+for i = 1:2
     if(i == 1)
         sens_system = 'pseudo';
     elseif(i == 2)
@@ -35,7 +37,7 @@ for i = 2:2
         sens_system = 'large';
     end
     %% Simulation
-%     Simulation(sens_system, output_source);
+    Simulation(sens_system, output_source);
     %% Inverse Solvers
     InverseSolvers(output_source);
     %% Results

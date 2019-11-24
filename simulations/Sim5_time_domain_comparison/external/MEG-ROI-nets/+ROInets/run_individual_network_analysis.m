@@ -642,7 +642,7 @@ end%if
 
 nParcels = ROInets.cols(spatialBasis);
 
-ft_progress('init', 'text', '');
+% ft_progress('init', 'text', '');
 
 switch lower(timeCourseGenMethod)
     case 'pca'
@@ -670,11 +670,11 @@ switch lower(timeCourseGenMethod)
         % perform PCA on each parcel and select 1st PC scores to represent
         % parcel
         for iParcel = nParcels:-1:1,
-            progress = nParcels - iParcel + 1;
-            ft_progress(progress / nParcels, ...
-                        [mfilename ...
-                         ':    Finding PCA time course for ROI %d out of %d'], ...
-                        iParcel, nParcels);
+%             progress = nParcels - iParcel + 1;
+%             ft_progress(progress / nParcels, ...
+%                         [mfilename ...
+%                          ':    Finding PCA time course for ROI %d out of %d'], ...
+%                         iParcel, nParcels);
                 
             thisMask = spatialBasis(:, iParcel);
             if any(thisMask), % non-zero
@@ -735,11 +735,11 @@ switch lower(timeCourseGenMethod)
                       
         % take peak voxel in each parcel
         for iParcel = nParcels:-1:1,
-            progress = nParcels - iParcel + 1;
-            ft_progress(progress / nParcels, ...
-                        [mfilename ...
-                         ':    Finding peak voxel time course for ROI %d out of %d'], ...
-                        iParcel, nParcels);
+%             progress = nParcels - iParcel + 1;
+%             ft_progress(progress / nParcels, ...
+%                         [mfilename ...
+%                          ':    Finding peak voxel time course for ROI %d out of %d'], ...
+%                         iParcel, nParcels);
             
             thisMask = spatialBasis(:, iParcel);
             
@@ -788,11 +788,11 @@ switch lower(timeCourseGenMethod)
         
         % find time-course for each spatial basis map
         for iParcel = nParcels:-1:1, % allocate memory on the fly
-            progress = nParcels - iParcel + 1;
-            ft_progress(progress / nParcels, ...
-                        [' ' mfilename ...
-                         ':    Finding spatial basis time course for ROI %d out of %d'], ...
-                        iParcel, nParcels);
+%             progress = nParcels - iParcel + 1;
+%             ft_progress(progress / nParcels, ...
+%                         [' ' mfilename ...
+%                          ':    Finding spatial basis time course for ROI %d out of %d'], ...
+%                         iParcel, nParcels);
             
             % extract the spatial map of interest
             thisMap     = scaledSpatialMaps(:, iParcel);
@@ -864,7 +864,7 @@ switch lower(timeCourseGenMethod)
                'Expected ''PCA'', ''spatialBasis'', or ''mean''. \n']);
 end%switch
 
-ft_progress('close');
+% ft_progress('close');
 
 end%get_node_tcs
 %--------------------------------------------------------------------------

@@ -1,9 +1,10 @@
-function [measures] = quality_measures(sol,Theta_sim,numSlice)
+function [measures] = quality_measures(sol,Theta0_sim)
 Nsim     = size(sol,2);
 Nmeth    = size(sol{3,1},3);
 measures = zeros(Nmeth,5,Nsim);
 for sim = 1:Nsim
-    Xsim = Theta_sim{sim}(:,:,numSlice);
+%     Xsim = Theta_sim{sim}(:,:,numSlice);
+    Xsim = Theta0_sim{sim};
 %     Xsim = abs(Xsim)./(sqrt(abs(diag(Xsim))*abs(diag(Xsim))') + 1E-4*max(abs((diag(Xsim)))));
     Xsim = Xsim - diag(diag(Xsim));
     Xsim(abs(Xsim) > 0) = 1;

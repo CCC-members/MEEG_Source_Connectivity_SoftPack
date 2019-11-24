@@ -36,10 +36,9 @@ if strcmp(sens_system,'pseudo') == 1 || strcmp(sens_system,'small') == 1
     Nsegments  = 1200; % sample number
     d0         = 9E0; % patches geodesic radious
 elseif strcmp(sens_system,'large') == 1
-    Nsegments  = 6000; % sample number
+    Nsegments  = 600; % sample number
     d0         = 1E-2; % patches geodesic radious
 end
-% db_source  = 0.1;
 db_source  = 0.1;
 db_sens    = 0.1;
 %%
@@ -61,7 +60,7 @@ elseif strcmp(sens_system,'pseudo') == 1
     load('data_tips22_pseudo.mat')
 end
 %%
-Nsim         = 2; %simulation times
+Nsim         = 1; %simulation times
 Nseed        = size(data_tips,2);
 
 if strcmp(sens_system,'large') == 1 || strcmp(sens_system,'small') == 1
@@ -76,11 +75,15 @@ if strcmp(sens_system,'large') == 1 || strcmp(sens_system,'small') == 1
 else
 %     Seeders      = 1:Nseed;
     Seeders      = zeros(1,Nseed);
-    for cont = 1:Nseed
-        coord_tmp = data_tips(cont).Position;
-        vx            = coord_tmp(1);
-        vy            = coord_tmp(2);
-        Seeders(cont) = pickpoint2d(vx,vy,vertices,1E-3);
+    if Nseed==22
+        Seeders=1:22;
+    else
+        for cont = 1:Nseed
+            coord_tmp = data_tips(cont).Position;
+            vx            = coord_tmp(1);
+            vy            = coord_tmp(2);
+            Seeders(cont) = pickpoint2d(vx,vy,vertices,1E-3);
+        end
     end
 end
 Seeders              = sort(Seeders);
@@ -95,7 +98,7 @@ options.extensions   = [ceil(Nseed/3); ceil(Nseed/3); Nseed - 2*ceil(Nseed/3)];
 Fs                   = 200;
 Fmin                 = 0;
 Fmax                 = Fs/2;
-Ntpoints             = 400;
+Ntpoints             = 512;
 deltaf               = Fs/Ntpoints;
 F                    = Fmin:deltaf:Fmax;
 Nfreqs               = length(F);

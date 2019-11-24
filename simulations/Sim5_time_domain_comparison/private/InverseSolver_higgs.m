@@ -36,32 +36,32 @@ for k_sim = 1:Nsim
     disp(['higgs & two-step solution for simulation # ',num2str(k_sim),' '])
     %% Preprocessing
     alphaBand=[9.5,10.5];
-    V_filt{k_sim}{1} =calc_band_pass(V_sim{k_sim}{1},alphaBand,Fs);
-    V_env{k_sim}{1}  =calc_envelope(V_filt{k_sim}{1},Fs);
-    Svv_sim{k_sim}{1}=calc_covariance(V_env{k_sim}{1});
-%     V_filt{k_sim}{1} =calc_band_pass(V_sim{k_sim}{1});
-%     Svv_sim{k_sim}{1}=calc_covariance(V_filt{k_sim}{1});
+    V_filt{k_sim}{1}   = calc_band_pass(V_sim{k_sim}{1},alphaBand,Fs);
+    V_env{k_sim}{1}    = calc_envelope(V_filt{k_sim}{1},Fs);
+    Svv_filt{k_sim}{1} = calc_covariance(V_filt{k_sim}{1});         
+    Svv_env{k_sim}{1}  = calc_covariance(V_env{k_sim}{1});
     %% connectivity leakage module
     Thetajj_est             = zeros(Nseed,Nseed,length(penalty) + 2);
     Sjj_est                 = zeros(Nseed,Nseed,length(penalty) + 2);
     %% h-hggm
     for k_penalty = 1:length(penalty)
         param.penalty  = penalty(k_penalty);
-        [Thetajj_est(:,:,k_penalty),Sjj_est(:,:,k_penalty),llh{k_penalty}] = higgs(Svv_sim{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
+        [Thetajj_est(:,:,k_penalty),Sjj_est(:,:,k_penalty),llh{k_penalty}] = higgs(Svv_env{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
     end
     %% eloreta + hggm
     param.gamma1        = 0.001;
     param.gamma2        = 0.05;
     param.delta_gamma   = 0.001;
-    [Thetajj_est(:,:,4),Sjj_est(:,:,4),gamma_grid,gamma,gcv] = eloreta_hg_lasso(Svv_sim{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
-    %%
-    
-      
+    [Thetajj_est(:,:,4),Sjj_est(:,:,4),gamma_grid,gamma,gcv] = eloreta_hg_lasso(Svv_env{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
     %% lcmv + hggm
-    param.gamma         = sum(abs(diag(Svv_sim{k_sim}{1})))/(length(Svv_sim{k_sim}{1})*100);
-    [Thetajj_est(:,:,5),Sjj_est(:,:,5)] = lcmv_hg_lasso(Svv_sim{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);    
-        
-    
+    param.gamma         = sum(abs(diag(Svv_env{k_sim}{1})))/(length(Svv_env{k_sim}{1})*100);
+    [Thetajj_est(:,:,5),Sjj_est(:,:,5)] = lcmv_hg_lasso(Svv_env{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);    
+    %% eloreta + Roi-nets
+    [~,~,~,~,~,Tjv{1}] = eloreta_hg_lasso(Svv_filt{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
+    Thetajj_est(:,:,6)=roi_nets_network_analysis(V_filt{k_sim}{1},Tjv{1},Fs,aj);
+    %% lcmv + Roi-nets
+    [~,~,Tjv{2}] = lcmv_hg_lasso(Svv_filt{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
+    Thetajj_est(:,:,7)=roi_nets_network_analysis(V_filt{k_sim}{1},Tjv{2},Fs,aj);   
     %%
     sol_h_hggm{1,k_sim}       = SeedsIdx;
     %%

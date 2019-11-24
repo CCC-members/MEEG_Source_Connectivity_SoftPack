@@ -1,4 +1,9 @@
 function energy=sigma_to_band_energy(sigma,band,deltaf)
+% Authors:
+% - Ying Wang
+
+% Date: Nov 24, 2019
+
 f=[round(band(1)/deltaf)+1:1:round(band(2)/deltaf)+1];
 [m,~,s]=size(sigma);
 energy=zeros(m,length(f));

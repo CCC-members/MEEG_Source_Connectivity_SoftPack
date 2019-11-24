@@ -1,4 +1,8 @@
 function [FtCoef,SigmaEpir,ThetaEpir]=gen_tensor_hggm(Sigma,Ntrial)
+% Pedro Valdes-Sosa, Oct 2017
+% Deirel Paz Linares, Oct 2017
+% Eduardo Gonzalez-Moreira, Oct 2017
+% Ying Wang, Oct 2019
 [n,~,t]=size(Sigma);
 if nargout>2
     SigmaEpir= ndSparse.build([n,n,t+1]  );
@@ -9,7 +13,7 @@ FtCoef=ones(Ntrial,n,t)+1i*ones(Ntrial,n,t);
 tic
 disp(['<gen_HggmToFtcoef.m> Generating ',num2str(Ntrial),' fourier coefficient samples from ', num2str(n), ' nodes ', num2str(size(Sigma,3)), ' slices cross spectrum;'])
 %%
-[userview systemview]=memory;
+
 %%
 if test_gpu
     FtCoef=gpuArray(FtCoef);
@@ -23,7 +27,7 @@ if test_gpu
         %         CEpir(:,:,i)           = (1/Ntrial)*(FtCoef(:,:,i).'*(FtCoef(:,:,i)));%% sample pseudo covariance
     end
     FtCoef=gather(FtCoef);
-elseif t*n<100000 || userview.MemAvailableAllArrays<1E10
+elseif t*n<100000 || test_memery(1e10)
     %     if 1
     for i=1:t
         Wisomph     = (1/2)*[real(Sigma(:,:,i)) -imag(Sigma(:,:,i)); imag(Sigma(:,:,i)) real(Sigma(:,:,i))];

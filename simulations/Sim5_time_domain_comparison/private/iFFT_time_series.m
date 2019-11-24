@@ -1,4 +1,8 @@
 function process = iFFT_time_series(fourier_coef,single_side)
+% Authors:
+% - Ying Wang
+
+% Date: Nov 24, 2019
 if nargin<2
     single_side=true;
 end

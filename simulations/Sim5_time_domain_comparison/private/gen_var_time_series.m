@@ -1,4 +1,8 @@
 function [y,res]=gen_var_time_series(A,Sigma,numTimepoints,numTrials,sampleRate,numWarmTimepoints)
+% Authors:
+% - Ying Wang
+
+% Date: Nov 24, 2019
 
 tic
 % assert(isVarStable(A),'VAR Coef not stable');
@@ -30,7 +34,7 @@ wholeNumTimepoints=numTimepoints+numWarmTimepoints;
 t=0:1/sampleRate:(wholeTime-1/sampleRate);
 c=zeros(numNodes,length(t));
 % if isa(A,'gpuArray')
-if test_gpu([],numNodes*wholeNumTimepoints*numTrials*4*2) 
+if test_gpu([],numNodes*wholeNumTimepoints*numTrials*4*2*1.5) 
     fprintf('<gen_var_time_series.m> Generating signals with variable(%d) order(%d) vector autoregressive model,trials=%d, numTimepoints=%d, using GPU;\n',...
         numNodes,maxLag,numTrials,numTimepoints);
     A=gpuArray(A);
@@ -59,7 +63,9 @@ else
 end
 y=permute(y,[1,3,2]);
 res=permute(res,[1,3,2]);
+
 y=var_time_series(A,y,res);
+
 y=permute(y,[1,3,2]);
 res=permute(res,[1,3,2]);
 y=y(:,numWarmTimepoints+1:end,:);
