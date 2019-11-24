@@ -1,4 +1,4 @@
-function [Thetajj,Sjj,gamma_grid,gamma,gcv] = eloreta_hg_lasso(Svv,Lvj,param)
+function [Thetajj,Sjj,gamma_grid,gamma,gcv,Tjv] = eloreta_hg_lasso(Svv,Lvj,param)
 p             = size(Lvj,1);
 Ip            = eye(p);
 scaleLvj      = sqrt(sum(abs(diag(Lvj*Lvj')))/p);
