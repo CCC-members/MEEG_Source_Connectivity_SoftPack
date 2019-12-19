@@ -14,7 +14,7 @@ function result = Main_HIGGS_TimeDomain(output_source)
 
 % Date: Nov 24, 2019
 
-% rng('default')
+rng('default')
 
 % addpath([fileparts(mfilename('fullpath')),filesep,'function'])
 addpath(genpath([fileparts(mfilename('fullpath')),filesep,'external']))
