@@ -1,3 +1,4 @@
+function [H,K]=calc_var_to_transfe(A,w,approxi)
 % Authors:
 % - Ying Wang
 
