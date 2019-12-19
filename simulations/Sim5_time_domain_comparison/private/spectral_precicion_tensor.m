@@ -1,11 +1,4 @@
 function [sigma,theta,F] = spectral_precicion_tensor(theta0, nu0,  tstudent_a, tstudent_b, tstudent_dof, deltaf, Fmin, Fmax)
-% - Ying Wang
-% - Ariosky Areces Gonzalez
-% - Deirel Paz Linares
-% - Eduardo Gonzalez Moreira
-% - Pedro A. Valdes Sosa
-
-% Date: Nov 24, 2019
 %% creationg a covariance/precision tensor with specific spectral form and assumptions of the underlying spectral factorization,
 % the assumptions of the spectral factorization are encoded by the function "apply tensor phase"
 %% Initializing
@@ -26,10 +19,10 @@ K = K./repmat(reshape(phi,1,1,length(F)),q,q,1);
 U = Iq - K;
 for count = 1:length(F)
     if (7 <= F(count)) && (F(count) <= 14)
-        theta(:,:,count) = (U(:,:,count)*U(:,:,count)').*mask0;
+        theta(:,:,count) = (U(:,:,count)'*U(:,:,count)).*mask0;
         sigma(:,:,count) = inv(theta(:,:,count));
     else
-        theta(:,:,count) = U(:,:,count)*U(:,:,count)';
+        theta(:,:,count) = U(:,:,count)'*U(:,:,count);
         sigma(:,:,count) = inv(theta(:,:,count));
     end
 end

@@ -1,14 +1,4 @@
-function [DataXi,noise_eneger]=gen_process_xi(Nnoise,Ntpoints,Nsegments,Nsubj,NoiseIdx,options)
-%%
-% Authors:
-% - Ying Wang
-% - Ariosky Areces Gonzalez
-% - Deirel Paz Linares
-% - Eduardo Gonzalez Moreira
-% - Pedro A. Valdes Sosa
-
-% Date: Nov 24, 2019
-
+function [DataXi,noise_eneger]=gen_process_and_theta_xi(Nnoise,Ntpoints,Nsegments,Nsubj,NoiseIdx,options)
 
 %% Xi process
 Axi= gen_NnvarAdjacent(options.vertices,options.faces);
@@ -27,8 +17,17 @@ end
 band_range=(pi/(options.Nfreqs-1))*[options.band(2,1)/options.deltaf:1:options.band(2,2)/options.deltaf];
 H=calc_var_to_transfe(Axi,band_range);
 for i=1:size(H,3)
-    Sxi(i)=norm(H(:,:,i),'fro').^2/size(Axi,1);% because the coefficient is a toeplitz matrix, so all nodes have same amplitude 
+    Sxi(i)=norm(H(:,:,i),'fro').^2/size(Axi,1);% because the coefficient is a toeplitz matrix, so all nodes have same amplitude
 end
 noise_eneger=sqrt(Sxi*options.Ntpoints);
 noise_eneger= repmat(noise_eneger,[Nnoise,1]);
+%%
+% band_range=(pi/(options.Nfreqs-1))*options.F;
+% [H,K]=calc_var_to_transfe(Axi,band_range);
+% U = eye(size(K,1)) - K;
+% for count = 1:length(options.F)
+%     theta_xi(:,:,count) = U(:,:,count)'*U(:,:,count);
+%     sigma_xi(:,:,count) = inv(theta_xi(:,:,count));
+% end
+% save('D:\code\MultiLagEegSimulation\LeakageCorrectionSimulation\result\DTF_xi.mat','-v7.3')
 end

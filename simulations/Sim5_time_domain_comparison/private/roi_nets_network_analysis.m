@@ -1,15 +1,11 @@
 function Mat=roi_nets_network_analysis(V_filt,Tjv,Fs,rho_ref)
-% Authors:
-% - Ying Wang
-
-% Date: Nov 24, 2019
 %% get source time series using Inverse projector and filtered data
 sourceSignal=zeros(size(Tjv,1),size(V_filt,2),size(V_filt,3));
 for i= 1:size(V_filt,3)
     sourceSignal(:,:,i)=Tjv*V_filt(:,:,i);
 end
 %% apply orthogonalization to source singnal 
-sourceSignal = calc_orthogonalize(sourceSignal,'householder');
+sourceSignal = calc_orthogonalize(sourceSignal,'closest');
 
 %% apply hilbert envelope to narrow band source signal
 [sourceSignalEnv, ~, ~]=calc_envelope(sourceSignal,Fs);

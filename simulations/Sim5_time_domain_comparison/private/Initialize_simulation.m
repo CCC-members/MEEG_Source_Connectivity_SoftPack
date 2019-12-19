@@ -36,7 +36,7 @@ if strcmp(sens_system,'pseudo') == 1 || strcmp(sens_system,'small') == 1
     Nsegments  = 1200; % sample number
     d0         = 9E0; % patches geodesic radious
 elseif strcmp(sens_system,'large') == 1
-    Nsegments  = 600; % sample number
+    Nsegments  = 512; % sample number
     d0         = 1E-2; % patches geodesic radious
 end
 db_source  = 0.1;

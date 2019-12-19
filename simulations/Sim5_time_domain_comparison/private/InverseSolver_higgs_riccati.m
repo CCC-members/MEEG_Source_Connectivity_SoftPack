@@ -1,4 +1,4 @@
-function [sol_h_hggm] = InverseSolver_higgs(V_sim,LeadFields,SeedsIdx,Nsegments,sens_system,Fs)
+function [sol_h_hggm] = InverseSolver_higgs_riccati(V_sim,LeadFields,SeedsIdx,Nsegments,sens_system,Fs)
 Nsim                = size(V_sim,2);
 Nseed               = size(SeedsIdx,1);
 Ntpoints            = size(V_sim{1,1}{1,1},2);
@@ -62,6 +62,11 @@ for k_sim = 1:Nsim
     %% lcmv + Roi-nets
     [~,~,Tjv{2}] = lcmv_hg_lasso(Svv_filt{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
     Thetajj_est(:,:,7)=roi_nets_network_analysis(V_filt{k_sim}{1},Tjv{2},Fs,aj);   
+    %% eloreta + Riccati
+    [Thetajj_est(:,:,8),Sjj_est(:,:,8),gamma_grid,gamma,gcv] = eloreta_riccati_hg_lasso(Svv_env{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
+    %% lcmv + Roi-nets
+    [Thetajj_est(:,:,9),Sjj_est(:,:,9)] = lcmv_riccati_hg_lasso(Svv_env{k_sim}{1},LeadFields{1}(:,SeedsIdx(:,k_sim)),param);
+
     %%
     sol_h_hggm{1,k_sim}       = SeedsIdx;
     %%

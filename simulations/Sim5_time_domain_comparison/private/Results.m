@@ -6,7 +6,7 @@ load('colormap2.mat')
 % load('Pseudorand_Net.mat')
 load([output_source,filesep,'Pseudorand_Net.mat'])
 measures_label    = {'auc' 'sens' 'spec' 'prec' 'f1'};
-methods_label     = {'higgs-lasso';'higgs-ridge';'higgs-naive';'eloreta-hglasso';'lcmv-hglasso';'eloreta-roinets';'lcmv-roinets'};
+methods_label     = {'higgs-lasso';'higgs-ridge';'higgs-naive';'eloreta-hglasso';'lcmv-hglasso';'eloreta-roinets';'lcmv-roinets';'eloreta-riccati-hglasso';'lcmv-riccati-hglasso'};
 Nmeasures         = length(measures_label);
 Nmethods          = length(methods_label);
 %%
@@ -36,7 +36,7 @@ Table(1,2:end)    = measures_label;
 Table(2:end,2:end)  = measures_higgs;
 
 
-save(strcat(output_source,filesep,'Table_sens_system_',sens_system,'.mat'));
+save(strcat(output_source,filesep,'Table_sens_system_',sens_system,'.mat'),'-v7.3');
 disp(strcat('Saving Table ---->  Table with quality measures to  ---> ', output_source) );
 
     
@@ -172,7 +172,7 @@ load('colormap3')
 X  = theta0_sim{1};
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,1); imagesc(abs(X));
+subplot(2,5,1); imagesc(abs(X));
 ylabel('generators')
 xlabel('generators')
 title('simulated PCoh')
@@ -180,7 +180,7 @@ title('simulated PCoh')
 X  = sol_higgs{3,1}(:,:,1);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,2); imagesc(abs(X)); 
+subplot(2,5,2); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('higgs-lasso PCoh')
@@ -188,7 +188,7 @@ title('higgs-lasso PCoh')
 X  = sol_higgs{3,1}(:,:,2);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,3); imagesc(abs(X)); 
+subplot(2,5,3); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('higgs-ridge PCoh')
@@ -196,7 +196,7 @@ title('higgs-ridge PCoh')
 X  = sol_higgs{3,1}(:,:,3);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,4); imagesc(abs(X)); 
+subplot(2,5,4); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('higgs-naive PCoh')
@@ -204,7 +204,7 @@ title('higgs-naive PCoh')
 X  = sol_higgs{3,1}(:,:,4);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,5); imagesc(abs(X)); 
+subplot(2,5,5); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('eloreta-hglasso PCoh')
@@ -212,7 +212,7 @@ title('eloreta-hglasso PCoh')
 X  = sol_higgs{3,1}(:,:,5);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,6); imagesc(abs(X)); 
+subplot(2,5,6); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('lcmv-hglasso PCoh')
@@ -220,7 +220,7 @@ title('lcmv-hglasso PCoh')
 X  = sol_higgs{3,1}(:,:,6);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,7); imagesc(abs(X)); 
+subplot(2,5,7); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('eloreta-roi-nets PCoh')
@@ -228,14 +228,31 @@ title('eloreta-roi-nets PCoh')
 X  = sol_higgs{3,1}(:,:,7);
 X  = X - diag(diag(X));
 X  = X/max(abs(X(:)));
-subplot(2,4,8); imagesc(abs(X)); 
+subplot(2,5,8); imagesc(abs(X)); 
 ylabel('generators')
 xlabel('generators')
 title('lcmv-roi-nets PCoh')
+%%
+X  = sol_higgs{3,1}(:,:,8);
+X  = X - diag(diag(X));
+X  = X/max(abs(X(:)));
+subplot(2,5,9); imagesc(abs(X)); 
+ylabel('generators')
+xlabel('generators')
+title('eloreta-riccati-hglasso PCoh')
+%%
+X  = sol_higgs{3,1}(:,:,9);
+X  = X - diag(diag(X));
+X  = X/max(abs(X(:)));
+subplot(2,5,10); imagesc(abs(X)); 
+ylabel('generators')
+xlabel('generators')
+title('lcmv-riccati-hglasso PCoh')
 
 
 %%
-colormap(cmap);
+% colormap(cmap);
+colormap(hot);
 
 saveas( figure_partial_coherences,strcat(output_source,filesep,'partial_coherence_maps_sens_system_',sens_system,'.fig'));
 disp(strcat('Saving figure ---->  Partial Coherence Maps to  ---> ', output_source) );
