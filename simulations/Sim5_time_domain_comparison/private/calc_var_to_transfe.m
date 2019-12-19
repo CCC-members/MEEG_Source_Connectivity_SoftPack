@@ -2,8 +2,6 @@
 % - Ying Wang
 
 % Date: Nov 24, 2019
-
-function [H,K]=calc_var_to_transfe(A,w,approxi)
 [n,~,p]=size(A);
 fprintf('<calc_var_to_transfe.m> Calculating transfer function from coefficient of variable(%d) order(%d) vector autoregressive model; \n',...
     n,p);
