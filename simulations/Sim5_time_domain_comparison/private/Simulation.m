@@ -53,9 +53,9 @@ for sim = 1:Nsim
     options.SeedsIdx=SeedsIdx;
     options.SeedsPos=SeedsPos;
     %% Simulating Alpha signal
-    [theta0,sigma,theta,process,process_eneger] = gen_processes(Nsegments,Nseed,options);
+    [theta0,sigma,theta,process,process_energy] = gen_processes(Nsegments,Nseed,options);
     %% Simulating Biological Noise
-    [rs0,noise_eneger] = gen_process_xi(Nnoise,Ntpoints,Nsegments,Nsubj,index_full,options);
+    [rs0,noise_energy] = gen_process_xi(Nnoise,Ntpoints,Nsegments,Nsubj,index_full,options);
     %%
     for segment = 1:Nsegments
         %% Simulating Sensors Time Series Data
@@ -69,10 +69,7 @@ for sim = 1:Nsim
         for subj = 1:Nsubj
             K                   = LeadFields{subj};
             rs_tmp              = K(:,index_full)*squeeze(rs0(:,:,segment,subj));
-%           noisesources{subj}  = db_source*sum(abs(V0{subj}(:)).^2)^(1/2)*rs_tmp/sum(abs(rs_tmp(:)).^2)^(1/2);
-%           SourceNoiseRatio=db_source*sum(abs(V0{subj}(:)).^2)^(1/2)/sum(abs(rs_tmp(:)).^2)^(1/2);
-%           SourceNoiseRatio=db_source* sum(abs(K(:,SeedsIdx(:,sim))*process_eneger).^2,[1,2])^(1/2) / sum(abs(K(:,index_full)*noise_eneger).^2,[1,2])^(1/2);
-            SourceNoiseRatio=db_source* sum(sum(abs(K(:,SeedsIdx(:,sim))*process_eneger).^2))^(1/2) / sum(sum(abs(K(:,index_full)*noise_eneger).^2))^(1/2);
+            SourceNoiseRatio=db_source* sum(sum(abs(K(:,SeedsIdx(:,sim))*process_energy).^2))^(1/2) / sum(sum(abs(K(:,index_full)*noise_energy).^2))^(1/2);
             noisesources{subj}  = SourceNoiseRatio*rs_tmp;
         end
         %% Simulating Sensors Noise

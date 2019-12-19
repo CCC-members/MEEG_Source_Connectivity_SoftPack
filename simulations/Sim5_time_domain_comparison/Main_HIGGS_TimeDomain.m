@@ -28,7 +28,7 @@ end
 
 %% Input Lead Field model
 
-for i = 1:2
+for i = 2:2
     if(i == 1)
         sens_system = 'pseudo';
     elseif(i == 2)
