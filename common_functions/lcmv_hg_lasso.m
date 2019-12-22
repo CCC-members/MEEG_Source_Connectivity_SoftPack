@@ -1,4 +1,4 @@
-function [Thetajj,Sjj] = lcmv_hg_lasso(Svv,Lvj,param)
+function [Thetajj,Sjj,Tjv] = lcmv_hg_lasso(Svv,Lvj,param)
 p             = size(Lvj,1);
 scaleLvj      = sqrt(sum(abs(diag(Lvj*Lvj')))/p);
 Lvj           = Lvj/scaleLvj;
