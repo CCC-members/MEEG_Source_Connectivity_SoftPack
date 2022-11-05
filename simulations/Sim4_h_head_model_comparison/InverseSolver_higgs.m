@@ -10,6 +10,7 @@ q                   = Nseed;
 param.p             = p;
 param.q             = q;
 param.Ip            = eye(p);
+param.Op            = ones(p,1);
 param.Iq            = eye(q);
 param.m             = Nsamp;
 aj                  = sqrt(log(q)/Nsamp);                                           
@@ -26,7 +27,11 @@ param.prew          = 0;
 param.nu            = Nsamp;
 param.rth1          = 0.7;
 param.rth2          = 3.16;
+param.eigreg        = 1E-4;
 llh                 = cell(1,length(penalty));
+param.use_gpu       = 1;
+param.run_bash_mode = 1;
+param.str_band      = "none";
 %%
 
 process_waitbar = waitbar(0,'Please wait...');
@@ -39,7 +44,7 @@ for k_sim = 1:Nsim
     %% h-hggm
     for k_penalty = 1:length(penalty)
         param.penalty  = penalty(k_penalty);
-        [Thetajj_est(:,:,k_penalty),Sjj_est(:,:,k_penalty),llh{k_penalty}] = higgs(Svv_sim{k_sim}{1},LeadFields{1}(:,Seeders_sim(:,k_sim)),param);
+        [Thetajj_est(:,:,k_penalty),Sjj_est(:,:,k_penalty),Tjv_est,llh{k_penalty}] = higgs(Svv_sim{k_sim}{1},LeadFields{1}(:,Seeders_sim(:,k_sim)),param);
     end
     %% eloreta + hggm
     param.gamma1        = 0.001;

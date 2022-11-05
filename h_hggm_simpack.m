@@ -8,11 +8,13 @@ classdef h_hggm_simpack < matlab.apps.AppBase
         SelectoutputfolderMenu        matlab.ui.container.Menu
         ExitMenu                      matlab.ui.container.Menu
         ToolsMenu                     matlab.ui.container.Menu
-        HGGMMenu                      matlab.ui.container.Menu
-        HGGMConvergenceJankovaConditionsMenu  matlab.ui.container.Menu
-        HHGGMSimplifiedHeadModelMenu  matlab.ui.container.Menu
-        HHGGMRealisticHeadModelMenu   matlab.ui.container.Menu
-        HHGGMHeadModelComparisonMenu  matlab.ui.container.Menu
+        SimulationsMenu               matlab.ui.container.Menu
+        GGSconvergenceandstatisticsMenu  matlab.ui.container.Menu
+        HIGGSexampleinidealheadmodelMenu  matlab.ui.container.Menu
+        HIGGSexampleinrealisticheadmodelMenu  matlab.ui.container.Menu
+        HIGGSperformanceanalysisMenu  matlab.ui.container.Menu
+        frequencydomainMenu           matlab.ui.container.Menu
+        timedomainMenu                matlab.ui.container.Menu
         SSVEPMenu                     matlab.ui.container.Menu
         EEGECOGMenu                   matlab.ui.container.Menu
         AllAnalyzeMenu                matlab.ui.container.Menu
@@ -170,7 +172,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             addpath('simulations/Sim1_hggm_convergence&jankova_conditions');
             addpath('simulations/Sim2_h_hggm_simplified_head_model');
             addpath('simulations/Sim3_h_hggm_realistic_head_model');
-            addpath('simulations/Sim4_h_head_model_comparison');
+            addpath('simulations/Sim4_h_head_model_comparison');            
+            addpath('simulations/Sim5_time_domain_comparison');
             addpath('simulations/Sim_data');
             addpath('ssvep');
         end
@@ -191,6 +194,7 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             addpath('simulations/Sim2_h_hggm_simplified_head_model');
             addpath('simulations/Sim3_h_hggm_realistic_head_model');
             addpath('simulations/Sim4_h_head_model_comparison');
+            addpath('simulations/Sim5_time_domain_comparison');
             addpath('simulations/Sim_data');
             addpath('ssvep');
             
@@ -202,8 +206,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             delete(app) ;
         end
 
-        % Menu selected function: HGGMConvergenceJankovaConditionsMenu
-        function HGGMConvergenceJankovaConditionsMenuSelected(app, event)
+        % Menu selected function: GGSconvergenceandstatisticsMenu
+        function GGSconvergenceandstatisticsMenuSelected(app, event)
             difine_paths(app)
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
@@ -212,7 +216,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         return;
                     end
                 end
-                Main_Jankova_test(app.output_sourse);
+                Main_Jankova_test1(app.output_sourse);
+                %Main_Jankova_test2(app.output_sourse);
                 msgbox('Completed operation','Info');
             end
         end
@@ -232,8 +237,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             end
         end
 
-        % Menu selected function: HHGGMSimplifiedHeadModelMenu
-        function HHGGMSimplifiedHeadModelMenuSelected(app, event)
+        % Menu selected function: HIGGSexampleinidealheadmodelMenu
+        function HIGGSexampleinidealheadmodelMenuSelected(app, event)
             difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
@@ -247,8 +252,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             end
         end
 
-        % Menu selected function: HHGGMRealisticHeadModelMenu
-        function HHGGMRealisticHeadModelMenuSelected(app, event)
+        % Menu selected function: HIGGSexampleinrealisticheadmodelMenu
+        function HIGGSexampleinrealisticheadmodelMenuSelected(app, event)
             difine_paths(app);
             if(get_test_data(app,true))
                 if(isempty( app.output_sourse) |  app.output_sourse==0)
@@ -262,19 +267,9 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             end
         end
 
-        % Menu selected function: HHGGMHeadModelComparisonMenu
-        function HHGGMHeadModelComparisonMenuSelected(app, event)
-            difine_paths(app);
-            if(get_test_data(app,true))
-                if(isempty( app.output_sourse) |  app.output_sourse==0)
-                    app.output_sourse = uigetdir('tittle','Select the Output Folder');
-                    if(app.output_sourse==0)
-                        return;
-                    end
-                end
-                Main_HIGGS_Head_Model_Comparison(app.output_sourse);
-                msgbox('Completed operation','Info');
-            end
+        % Callback function
+        function HIGGSperformanceanalysisMenuSelected(app, event)
+            
         end
 
         % Menu selected function: SelectoutputfolderMenu
@@ -296,7 +291,8 @@ classdef h_hggm_simpack < matlab.apps.AppBase
                         return;
                     end
                 end
-                Main_Jankova_test(app.output_sourse);
+                Main_Jankova_test1(app.output_sourse);
+                %Main_Jankova_test2(app.output_sourse);
                 Main_simplified_em_penalty_test(app.output_sourse);
                 Main_realistic_em_penalty_test(app.output_sourse);
                 Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
@@ -324,6 +320,37 @@ classdef h_hggm_simpack < matlab.apps.AppBase
         % Menu selected function: SelectdatafileMenu
         function SelectdatafileMenuSelected(app, event)
             get_test_data(app,false);
+        end
+
+        % Menu selected function: frequencydomainMenu
+        function frequencydomainMenuSelected(app, event)
+            difine_paths(app);
+            if(get_test_data(app,true))
+                if(isempty( app.output_sourse) ||  app.output_sourse==0)
+                    app.output_sourse = uigetdir('tittle','Select the Output Folder');
+                    if(app.output_sourse==0)
+                        return;
+                    end
+                end
+                Main_H_HGGM_Head_Model_Comparison(app.output_sourse);
+                msgbox('Completed operation','Info');
+            end
+        end
+
+        % Menu selected function: timedomainMenu
+        function timedomainMenuSelected(app, event)
+            % put function
+            difine_paths(app);
+            if(get_test_data(app,true))
+                if(isempty( app.output_sourse) ||  app.output_sourse==0)
+                    app.output_sourse = uigetdir('tittle','Select the Output Folder');
+                    if(app.output_sourse==0)
+                        return;
+                    end
+                end
+                Main_HIGGS_TimeDomain(app.output_sourse);
+                msgbox('Completed operation','Info');
+            end
         end
     end
 
@@ -361,29 +388,38 @@ classdef h_hggm_simpack < matlab.apps.AppBase
             app.ToolsMenu = uimenu(app.HHGGMSimulationPackUIFigure);
             app.ToolsMenu.Text = 'Tools';
 
-            % Create HGGMMenu
-            app.HGGMMenu = uimenu(app.ToolsMenu);
-            app.HGGMMenu.Text = 'HGGM';
+            % Create SimulationsMenu
+            app.SimulationsMenu = uimenu(app.ToolsMenu);
+            app.SimulationsMenu.Text = 'Simulations';
 
-            % Create HGGMConvergenceJankovaConditionsMenu
-            app.HGGMConvergenceJankovaConditionsMenu = uimenu(app.HGGMMenu);
-            app.HGGMConvergenceJankovaConditionsMenu.MenuSelectedFcn = createCallbackFcn(app, @HGGMConvergenceJankovaConditionsMenuSelected, true);
-            app.HGGMConvergenceJankovaConditionsMenu.Text = 'HGGM Convergence & Jankova Conditions';
+            % Create GGSconvergenceandstatisticsMenu
+            app.GGSconvergenceandstatisticsMenu = uimenu(app.SimulationsMenu);
+            app.GGSconvergenceandstatisticsMenu.MenuSelectedFcn = createCallbackFcn(app, @GGSconvergenceandstatisticsMenuSelected, true);
+            app.GGSconvergenceandstatisticsMenu.Text = 'GGS convergence and statistics';
 
-            % Create HHGGMSimplifiedHeadModelMenu
-            app.HHGGMSimplifiedHeadModelMenu = uimenu(app.HGGMMenu);
-            app.HHGGMSimplifiedHeadModelMenu.MenuSelectedFcn = createCallbackFcn(app, @HHGGMSimplifiedHeadModelMenuSelected, true);
-            app.HHGGMSimplifiedHeadModelMenu.Text = 'H-HGGM Simplified Head Model';
+            % Create HIGGSexampleinidealheadmodelMenu
+            app.HIGGSexampleinidealheadmodelMenu = uimenu(app.SimulationsMenu);
+            app.HIGGSexampleinidealheadmodelMenu.MenuSelectedFcn = createCallbackFcn(app, @HIGGSexampleinidealheadmodelMenuSelected, true);
+            app.HIGGSexampleinidealheadmodelMenu.Text = 'HIGGS example in ideal head model';
 
-            % Create HHGGMRealisticHeadModelMenu
-            app.HHGGMRealisticHeadModelMenu = uimenu(app.HGGMMenu);
-            app.HHGGMRealisticHeadModelMenu.MenuSelectedFcn = createCallbackFcn(app, @HHGGMRealisticHeadModelMenuSelected, true);
-            app.HHGGMRealisticHeadModelMenu.Text = 'H-HGGM Realistic Head Model';
+            % Create HIGGSexampleinrealisticheadmodelMenu
+            app.HIGGSexampleinrealisticheadmodelMenu = uimenu(app.SimulationsMenu);
+            app.HIGGSexampleinrealisticheadmodelMenu.MenuSelectedFcn = createCallbackFcn(app, @HIGGSexampleinrealisticheadmodelMenuSelected, true);
+            app.HIGGSexampleinrealisticheadmodelMenu.Text = 'HIGGS example in realistic head model';
 
-            % Create HHGGMHeadModelComparisonMenu
-            app.HHGGMHeadModelComparisonMenu = uimenu(app.HGGMMenu);
-            app.HHGGMHeadModelComparisonMenu.MenuSelectedFcn = createCallbackFcn(app, @HHGGMHeadModelComparisonMenuSelected, true);
-            app.HHGGMHeadModelComparisonMenu.Text = 'H-HGGM Head Model Comparison';
+            % Create HIGGSperformanceanalysisMenu
+            app.HIGGSperformanceanalysisMenu = uimenu(app.SimulationsMenu);
+            app.HIGGSperformanceanalysisMenu.Text = 'HIGGS performance analysis';
+
+            % Create frequencydomainMenu
+            app.frequencydomainMenu = uimenu(app.HIGGSperformanceanalysisMenu);
+            app.frequencydomainMenu.MenuSelectedFcn = createCallbackFcn(app, @frequencydomainMenuSelected, true);
+            app.frequencydomainMenu.Text = 'frequency domain';
+
+            % Create timedomainMenu
+            app.timedomainMenu = uimenu(app.HIGGSperformanceanalysisMenu);
+            app.timedomainMenu.MenuSelectedFcn = createCallbackFcn(app, @timedomainMenuSelected, true);
+            app.timedomainMenu.Text = 'time domain';
 
             % Create SSVEPMenu
             app.SSVEPMenu = uimenu(app.ToolsMenu);

@@ -24,7 +24,7 @@ if(~isfolder(output_sourse))
 mkdir(output_sourse);
 end
  
-for i = 1:2
+for i = 1:1
     process_waitbar = waitbar(0,'Please wait...');
     if(i == 1)
         sens_system = 'small';
@@ -111,13 +111,16 @@ for i = 1:2
     %% Data empirical covariance
     Svv                 = cov(v');
     %% Likelihood test
+    param.use_gpu       = 0;
+    param.run_bash_mode = 0;
+    param.str_band      = "none";
     param.maxiter_outer = 60;
     param.maxiter_inner = 30;
     p                   = length(Svv);
-    q                   = length(Seeders);
     param.p             = p;
     param.q             = q;
     param.Ip            = eye(p);
+    param.Op            = ones(p,1);
     param.Iq            = eye(q);
     param.m             = m;
     aj                  = sqrt(log(q)/m);
@@ -134,16 +137,16 @@ for i = 1:2
     param.nu            = m;
     param.rth1          = 0.7;
     param.rth2          = 3.16;
+    param.eigreg        = 1E-4;
     %%
     penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
     Thetajj_est         = zeros(q,q,length(penalty) + 2);
     llh_outer           = cell(1,length(penalty));
     llh_inner           = cell(1,length(penalty));
     waitbar(4/4,process_waitbar,strcat('higgs & two-step solution - SS:',sens_system ));
-    for cont = 1:length(penalty)
-        
+    for cont = 1:length(penalty)       
         param.penalty  = penalty(cont);
-        [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont}] = higgs(Svv,Lvj(:,Seeders),param);
+        [Thetajj_est(:,:,cont),Sjj_est,Tjv_est,llh_outer{cont}] = higgs(Svv,Lvj(:,Seeders),param);
     end
     
     %% eloreta + hggm

@@ -83,11 +83,8 @@ delete(process_waitbar);
 save(strcat('simulations',filesep,'Sim2_h_hggm_simplified_head_model',filesep,'HeadModel_pseudo'),'cortex','coor')
 
 %%
-
 process_waitbar = waitbar(0,'Please wait...');
 
-[U,D,V]         = svd(Lvj,'econ');
-dmin            = min(diag(D));
 %% Generate data
 v0              = Lvj*j_sim; % data (observation)
 %% Biological noise
@@ -102,6 +99,9 @@ v               = v0 + 0.1*bionoise + 0.1*sensnoise;
 %% Data empirical covariance
 Svv             = cov(v');
 %% Likelihood test
+param.use_gpu       = 1;
+param.run_bash_mode = 1;
+param.str_band      = "none";
 param.maxiter_outer = 60;
 param.maxiter_inner = 30;
 p                   = length(Svv);
@@ -109,6 +109,7 @@ q                   = size(Lvj,2);
 param.p             = p;
 param.q             = q;
 param.Ip            = eye(p);
+param.Op            = ones(p,1);
 param.Iq            = eye(q);
 param.m             = m;
 aj                  = sqrt(log(q)/m);                                           
@@ -121,10 +122,11 @@ param.axi           = 1E-4;
 param.Axixi         = eye(p);
 param.Axixi_inv     = eye(p);
 param.ntry          = 0;
-param.prew          = 0;
+param.prew          = 1;
 param.nu            = m;
 param.rth1          = 0.7;
 param.rth2          = 3.16;
+param.eigreg        = 1E-4;
 %% h-hggm
 penalty             = [1 2 0]; % 1 (lasso) 2 (frobenious) 0 (naive)
 Thetajj_est         = zeros(q,q,length(penalty) + 2);
@@ -132,7 +134,7 @@ llh_outer           = cell(1,length(penalty));
 for cont = 1:length(penalty)
     waitbar((cont)/(length(penalty)),process_waitbar,strcat('Likelihood test'));
     param.penalty   = penalty(cont);
-    [Thetajj_est(:,:,cont),Sjj_est,llh_outer{cont}] = higgs(Svv,Lvj,param);
+    [Thetajj_est(:,:,cont),Sjj_est,Tjv_est,llh_outer{cont}] = higgs(Svv,Lvj,param);
 end
 %% eloreta + hggm
 param.gamma1        = 0.001;
