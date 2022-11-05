@@ -27,9 +27,9 @@ for cont4 = 1:Nsubj
     K_tmp            = K_tmp/scale_K_tmp;                                 % Lead Field scaling
     Kt_tmp           = Kt_tmp/scale_K_tmp;
     %% Calibration Inverse Solution
-    sigmaKt          = spdiags(2*sigma,0,Nv,Nv)*Kt_tmp;
+    sigmaKt          = spdiags(sigma,0,Nv,Nv)*Kt_tmp;
     sigma_post1      = sigmaKt/(K_tmp*sigmaKt+beta*Ine_tmp);
-    sigma_post2      = K_tmp*spdiags(2*sigma,0,Nv,Nv);
+    sigma_post2      = K_tmp*spdiags(sigma,0,Nv,Nv);
     for jj=1:Nv
         sigma2j_pst(jj,cont4) = sigma(jj)-sigma_post1(jj,:)*sigma_post2(:,jj);
     end
@@ -64,9 +64,9 @@ for cont1 = 1:maxiter1
     for cont11 = 1:maxiter11
         for cont4 = 1:Nsubj
             %% Update Posterior Mean and Covariance matrix
-            sigmaKt     = spdiags(2*sigma,0,Nv,Nv)*Kt{cont4};
+            sigmaKt     = spdiags(sigma,0,Nv,Nv)*Kt{cont4};
             sigma_post1 = sigmaKt/(Lvj{cont4}*sigmaKt+beta*Ine{cont4});
-            sigma_post2 = Lvj{cont4}*spdiags(2*sigma,0,Nv,Nv);
+            sigma_post2 = Lvj{cont4}*spdiags(sigma,0,Nv,Nv);
             % Only save the diagonals of the Posterior Covariance
             for jj=1:Nv
                 sigma2j_pst(jj,cont4) = sigma(jj)-sigma_post1(jj,:)*sigma_post2(:,jj);

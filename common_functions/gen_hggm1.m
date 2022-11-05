@@ -1,4 +1,4 @@
-function [S,Data,X] = gen_hggm1(m,q,nblocks,options)
+function [S,Data,Theta] = gen_hggm1(param)
 %% Hermitian Gaussian Graphical Model generator 
 %  the gaussian engine samples come from a random binary precision matrix
 %  the precision matrix is defined as a block structure with overlaping
@@ -8,7 +8,10 @@ function [S,Data,X] = gen_hggm1(m,q,nblocks,options)
 % Deirel Paz Linares, Oct 2017
 % Eduardo Gonzalez-Moreira, Oct 2017
 %%
-if options.config == 1
+m        = param.m;
+q        = param.q;
+nblocks  = param.nblocks;
+if param.config == 1
     %% Non overlapping blocks
     X                  = eye(q); 
     %Infimum and maximum size of blocks
@@ -19,9 +22,9 @@ if options.config == 1
         size           = randi([infsize maxsize]);
         blockRe        = 2*(rand(size) - 0.5);
         blockRe        = (blockRe + blockRe')/2;
-        if options.var == 1
+        if param.var == 1
             block = blockRe;
-        elseif options.var == 2
+        elseif param.var == 2
             blockIm    = 2*(rand(size) - 0.5);
             blockIm    = (blockIm - blockIm')/2;
             block      = blockRe + 1i*blockIm;
@@ -37,7 +40,7 @@ if options.config == 1
         X(index,index) = block;
     end
 end
-if options.config == 2
+if param.config == 2
     %% Overlapping blocks 
     X        = eye(q); 
     %Infimum and maximum size of blocks
@@ -48,9 +51,9 @@ if options.config == 2
         size           = randi([infsize maxsize]);
         blockRe        = 2*(rand(size) - 0.5);
         blockRe        = (blockRe + blockRe')/2;
-        if options.var == 1
+        if param.var == 1
             block = blockRe;
-        elseif options.var == 2
+        elseif param.var == 2
             blockIm    = 2*(rand(size) - 0.5);
             blockIm    = (blockIm - blockIm')/2;
             block      = blockRe + 1i*blockIm;
@@ -73,13 +76,14 @@ end
 %% Applying isomorphism and generating data
 W               = eye(q)/X;
 W               = (W + W')/2;
-if options.var == 1
+if param.var == 1
     Data        = mvnrnd(zeros(1,q),W,m);
-elseif options.var == 2
+elseif param.var == 2
     Wisomph     = [real(W) -imag(W); imag(W) real(W)];
     Data_isomph = mvnrnd(zeros(1,2*q),Wisomph,m);
     DataRe      = Data_isomph(:,1:q);
     DataIm      = Data_isomph(:,q+1:2*q);
     Data        = DataRe + 1i*DataIm;
 end
-S           = (1/m)*(Data'*Data);
+Theta       = eigendecomposition(X,param);
+S           = eigendecomposition((1/m)*(Data'*Data),param);

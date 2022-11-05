@@ -25,8 +25,8 @@ end
 gamma                     = gamma_grid(idx_gamma);
 [Tjv,Wout]                = mkfilt_eloreta(Lvj,gamma);
 Tjv                       = Tjv';
-Sjj                       = Tjv*Svv*Tjv';
-Sjj                       = (Sjj + Sjj')/2;
+Sjj                       = higgs_eigendecomposition(Tjv*Svv*Tjv',param);
 [Thetajj,Sigmajj]         = twostep_lasso_caller(Sjj,param);
-
+Thetajj                   = Thetajj.X;
+Sjj                       = Sjj.X;
 end

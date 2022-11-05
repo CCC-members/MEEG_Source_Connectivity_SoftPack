@@ -5,12 +5,13 @@ Lvj           = Lvj/scaleLvj;
 scaleV        = (sum(abs(diag(Svv)))/p);
 Svv           = Svv/scaleV;
 gamma         = param.gamma;
+gamma         = gamma/scaleV;
 %%
 [Tjv,T1jv,Wout]   = mkfilt_lcmv(Lvj,Svv,gamma);
 Tjv               = Tjv';
 %%
-Sjj               = Tjv*Svv*Tjv';
-Sjj               = (Sjj + Sjj')/2;
+Sjj               = higgs_eigendecomposition(Tjv*Svv*Tjv',param);
 [Thetajj,Sigmajj] = twostep_lasso_caller(Sjj,param);
-
+Thetajj           = Thetajj.X;
+Sjj               = Sjj.X;
 end
