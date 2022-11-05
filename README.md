@@ -29,6 +29,7 @@ Principal package
         - Sim2_h_hggm_simplified_head_model ()
         - Sim3_h_hggm_realistic_head_model ()
         - Sim4_h_head_model_comparison ()
+        - Sim5_h_EEG_ECoG_comparison ()
     - ssvep ()
 
 
